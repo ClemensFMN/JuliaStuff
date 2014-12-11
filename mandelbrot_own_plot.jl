@@ -29,6 +29,6 @@ for i=1:N
 	end
 end
 
-imagesc(A)
+imagesc(A')
 
 
