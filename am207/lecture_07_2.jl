@@ -43,6 +43,8 @@ mu_x = 1.0
 # our observation
 y = 1.8
 
+N = int(1e6)
+
 # likelihood function y|x \sim N(y, x, s2_w)
 flh = Normal(y, sqrt(s2_w))
 # the a priori distribution x \sim N(x, mu_x, s2_x)
