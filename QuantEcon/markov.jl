@@ -1,16 +1,21 @@
+using Distributions
+
 # based on https://github.com/QuantEcon/QuantEcon.jl/blob/master/src/mc_tools.jl
 
-type MarkovChain
+immutable type MarkovChain
     p::Matrix # valid stochastic matrix
 
     function MarkovChain{T}(p::Matrix{T})
         n,m = size(p)
 
         n != m && throw(ArgumentError("stochastic matrix must be square"))
+        
         any(p .< 0) &&
             throw(ArgumentError("stochastic matrix must have nonnegative elements"))
-        #isapprox(sum(p,2),one(T)) ||
-        #    throw(ArgumentError("stochastic matrix rows must sum to 1"))
+        
+        if(all(map(x->isapprox(x,1), sum(p, 2))) )
+            error("stochastic matrix rows must sum to 1")
+        end
         new(p)
     end
 end
@@ -40,16 +45,20 @@ end
 
 
 
-mc = MarkovChain([0.2 0.8; 0.5 0.5])
+mc = MarkovChain([0.2 0.4 0.4; 0.45 0.1 0.45; 0.7 0.2 0.1])
 
 N = 10000
 
 pth = mc_sample_path(mc, 1, N)
 
-# number of ones
-println(sum(pth.==1))
-# number of twos
-println(sum(pth.==2))
 
-# we seem to have a fixed point near 0.38 0.62
-[0.38 0.62] * mc.p
+for i in 1:n_states(mc)
+    println(i, "   ", sum(pth.==i)/N)
+end
+
+
+eigval, eigvec = eig(mc.p')
+# find the eigenvector belonging to the eigenval of 1
+isunit = map(x->isapprox(x,1), eigval)
+e1 = real(eigvec[:,isunit])
+e1./sum(e1)
