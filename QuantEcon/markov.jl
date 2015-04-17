@@ -13,7 +13,7 @@ immutable type MarkovChain
         any(p .< 0) &&
             throw(ArgumentError("stochastic matrix must have nonnegative elements"))
         
-        if(all(map(x->isapprox(x,1), sum(p, 2))) )
+        if(!all(map(x->isapprox(x,1), sum(p, 2))) )
             error("stochastic matrix rows must sum to 1")
         end
         new(p)
