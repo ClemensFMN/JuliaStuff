@@ -33,7 +33,7 @@ function mc_sample_path(mc::MarkovChain,
                         sample_size::Int=1000)
     p       = float(mc.p) # ensure floating point input for Categorical()
     dist    = [Categorical(vec(p[i,:])) for i=1:n_states(mc)]
-    println(dist)
+
     samples = Array(Int,sample_size+1) # +1 extra for the init
     samples[1] = init
     for t=2:length(samples)
@@ -43,6 +43,52 @@ function mc_sample_path(mc::MarkovChain,
     samples
 end
 
+
+# mc_sample_path_stop()
+# simulate a discrete markov chain starting from some initial value
+# mc::MarkovChain
+# init::Int initial state
+# stop::Int stop state
+function mc_sample_path_stop(mc::MarkovChain,
+                        init::Int, stop::Int)
+    p       = float(mc.p) # ensure floating point input for Categorical()
+    dist    = [Categorical(vec(p[i,:])) for i=1:n_states(mc)]
+
+    samples = Array(Int,10000) # +1 extra for the init
+    samples[1] = init
+
+    t = 2
+
+    while true
+
+        last = samples[t-1]
+        samples[t]= rand(dist[last])
+
+        if(samples[t] == stop)
+            
+            break
+        end
+        t = t + 1
+    end
+
+    return samples
+
+end
+
+
+
+
+# get_steady_probs
+# get stationary probabilities of a Markov Chain
+function get_steady_probs(mc::MarkovChain)
+
+    eigval, eigvec = eig(mc.p')
+    # find the eigenvector belonging to the eigenval of 1
+    isunit = map(x->isapprox(x,1), eigval)
+    e1 = real(eigvec[:,isunit])
+    e1./sum(e1)
+
+end
 
 
 mc = MarkovChain([0.2 0.4 0.4; 0.45 0.1 0.45; 0.7 0.2 0.1])
@@ -57,8 +103,9 @@ for i in 1:n_states(mc)
 end
 
 
-eigval, eigvec = eig(mc.p')
-# find the eigenvector belonging to the eigenval of 1
-isunit = map(x->isapprox(x,1), eigval)
-e1 = real(eigvec[:,isunit])
-e1./sum(e1)
+println(get_steady_probs(mc))
+
+
+
+pth1 = mc_sample_path_stop(mc, 1, 2)
+
