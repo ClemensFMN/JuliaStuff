@@ -45,41 +45,37 @@ end
 
 
 # mc_sample_path_stop()
-# simulate a discrete markov chain starting from some initial value
+# simulate a discrete markov chain starting from some initial value till it reaches a defined stop state
 # mc::MarkovChain
 # init::Int initial state
 # stop::Int stop state
-function mc_sample_path_stop(mc::MarkovChain,
-                        init::Int, stop::Int)
+function mc_sample_path_stop(mc::MarkovChain, init::Int, stop::Int)
     p       = float(mc.p) # ensure floating point input for Categorical()
     dist    = [Categorical(vec(p[i,:])) for i=1:n_states(mc)]
 
-    samples = Array(Int,10000) # +1 extra for the init
-    samples[1] = init
+    samples = [init]
 
     t = 2
 
     while true
 
         last = samples[t-1]
-        samples[t]= rand(dist[last])
+        nw = rand(dist[last])
+        samples= [samples, nw]
 
-        if(samples[t] == stop)
-            
+        if(nw == stop)
             break
         end
         t = t + 1
     end
 
-    return samples
+    return samples, length(samples)
 
 end
 
 
-
-
 # get_steady_probs
-# get stationary probabilities of a Markov Chain
+# get stationary state distribution of a Markov Chain
 function get_steady_probs(mc::MarkovChain)
 
     eigval, eigvec = eig(mc.p')
@@ -93,19 +89,41 @@ end
 
 mc = MarkovChain([0.2 0.4 0.4; 0.45 0.1 0.45; 0.7 0.2 0.1])
 
-N = 10000
+N = 100000
 
-pth = mc_sample_path(mc, 1, N)
+# simulate Markov Chain
+#pth = mc_sample_path(mc, 1, N)
+
+# and empirically measure the stationary distribution of states
+#for i in 1:n_states(mc)
+#    println(i, "   ", sum(pth.==i)/N)
+#end
 
 
-for i in 1:n_states(mc)
-    println(i, "   ", sum(pth.==i)/N)
+start = 1
+stop = 3
+
+
+len_vec = zeros(N)
+for i in 1:N
+
+    pth, ln = mc_sample_path_stop(mc, start, stop)
+    len_vec[i] = ln
+
 end
 
+println(mean(len_vec))
 
-println(get_steady_probs(mc))
+# the vector of the stationary probs
+w = get_steady_probs(mc)
+# now as a matrix
+W = repeat(w', outer=[n_states(mc), 1])
+# the Z matrix is required for calculating the mean first passage time (MFPT)
+Z = inv(eye(n_states(mc)) - mc.p + W)
 
-
-
-pth1 = mc_sample_path_stop(mc, 1, 2)
+# calculate the mfpt between state "start" & "stop"; i.e. starting in "start",
+# after how many steps is the state "stop" reached?
+# careful: mc_sample_path_stop counts the number of steps, MFPT is defined as number of
+# states => mean(len_vec) = MFPT + 1
+mfpt = (Z[stop,stop] - Z[start,stop]) / w[stop]
 
