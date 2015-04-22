@@ -86,6 +86,23 @@ function get_steady_probs(mc::MarkovChain)
 
 end
 
+# mfpt calculate the mean first passage time between states start and stop of
+# the markov chain mc
+function mfpt(mc::MarkovChain, start::Int, stop::Int)
+
+    # the vector of the stationary probs
+    w = get_steady_probs(mc)
+    # now as a matrix
+    W = repeat(w', outer=[n_states(mc), 1])
+    # the Z matrix is required for calculating the mean first passage time (MFPT)
+    Z = inv(eye(n_states(mc)) - mc.p + W)
+
+    # calculate the mfpt between state "start" & "stop"; i.e. starting in "start",
+    # after how many steps is the state "stop" reached?
+    (Z[stop,stop] - Z[start,stop]) / w[stop]
+
+end
+
 
 mc = MarkovChain([0.2 0.4 0.4; 0.45 0.1 0.45; 0.7 0.2 0.1])
 
@@ -114,16 +131,7 @@ end
 
 println(mean(len_vec))
 
-# the vector of the stationary probs
-w = get_steady_probs(mc)
-# now as a matrix
-W = repeat(w', outer=[n_states(mc), 1])
-# the Z matrix is required for calculating the mean first passage time (MFPT)
-Z = inv(eye(n_states(mc)) - mc.p + W)
 
-# calculate the mfpt between state "start" & "stop"; i.e. starting in "start",
-# after how many steps is the state "stop" reached?
 # careful: mc_sample_path_stop counts the number of steps, MFPT is defined as number of
 # states => mean(len_vec) = MFPT + 1
-mfpt = (Z[stop,stop] - Z[start,stop]) / w[stop]
-
+println(mfpt(mc, start, stop))
