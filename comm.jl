@@ -1,26 +1,23 @@
 using Distributions
 
-N = int(1e5)
+N = int(1e6)
 L = 1
 
-SNRvec = -10:2:6
+SNRvec = -10:4:20
 sw2vec = 10.^(-SNRvec/10)
 
+bdist = Bernoulli(0.5)
+hdist = Normal(0, 1)
 
 BER = zeros(length(SNRvec))
 
 for snr_iter = 1:length(SNRvec)
 
 	sw2 = sw2vec[snr_iter]
-
-	bdist = Bernoulli(0.5)
+	wdist = Normal(0, sw2)
 
 	b = rand(bdist, N)
-
 	x = 2*b-1
-
-	hdist = Normal(1, 0.001)
-	wdist = Normal(0, sw2)
 
 	bhat = zeros(N)
 
@@ -34,13 +31,7 @@ for snr_iter = 1:length(SNRvec)
 
 	end
 
-	errs = 0
-
-	for i = 1:N
-		if(bhat[i] != x[i])
-			errs = errs+1
-		end
-	end
+	errs = length(find(bhat.!=x))
 
 	println(errs/N)
 	BER[snr_iter] = errs/N
@@ -49,5 +40,5 @@ end
 
 print(BER)
 
-writedlm("L1.csv", [SNRvec BER])
+writedlm("L$L.csv", [SNRvec BER])
 
