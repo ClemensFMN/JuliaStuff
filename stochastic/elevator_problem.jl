@@ -6,7 +6,7 @@
 
 using StatsBase
 
-N = round(Int, 1e6)
+N = round(Int, 1e7)
 
 # number of buttons
 M = 13
@@ -40,5 +40,5 @@ println(success / N)
 println(factorial(L)*(M-L+1)/M^L)
 
 # NOT allowing pressing the same button more than once: in total we have L places into which we can place M different elements -> M x M-1 x M-2 ... M-L+1 cases
-println(factorial(L)*(M-L+1)/(13*12*11))
+println(factorial(L)*(M-L+1)/(factorial(M)/factorial(M-L)))
 
