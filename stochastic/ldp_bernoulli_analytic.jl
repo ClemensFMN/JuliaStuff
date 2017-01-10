@@ -23,7 +23,7 @@ function markov_bound(p,n,a)
 end
 
 
-Npoints = 10
+Npoints = 25
 p = 0.5
 n = 50
 avec = linspace(p,1,Npoints)
@@ -45,4 +45,4 @@ for (ind, val) in enumerate(avec)
 end
 
 
-semilogy(avec, exact, "-rx", avec, ldp_b, "-bo", markov_b, "-g")
+semilogy(avec, exact, "-rx", avec, ldp_b, "-bo", avec, markov_b, "-g")
