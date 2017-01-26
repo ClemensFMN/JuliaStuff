@@ -45,4 +45,6 @@ for (ind, val) in enumerate(avec)
 end
 
 
-semilogy(avec, exact, "-rx", avec, ldp_b, "-bo", avec, markov_b, "-g")
+semilogy(avec, exact, "-r", avec, ldp_b, "-b", avec, markov_b, "-g")
+grid()
+savefig("ldp_bernoulli.png")
