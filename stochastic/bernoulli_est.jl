@@ -8,7 +8,8 @@
 # P(model | observation) \propto P(observation | model)
 # and P(observation | model) = (H+T \over H) p^h (1-p)^T
 
-using Winston
+using Gadfly
+using DataFrames
 
 pvec = linspace(0,1,100)
 
@@ -37,13 +38,16 @@ end
 
 ps = ps ./ sum(ps,2)
     
-#p = FramedPlot()
-#c = Curve(pvec, ps[2,:],color="red")#, symbolkind="circle")
-#setattr(c,label="(HH)")
-#style(c,symbolkind="circle")
-#add(p,c)
 
-plot(pvec, ps[1,:],"-r", pvec, ps[2,:],"-g", pvec, ps[3,:],"-y", pvec, ps[4,:],"-k", pvec, ps[5,:],"-k:")
-legend(["(H)","(HH)","HHT","HHTT", "20H, 20T"])
-grid()
-savefig("bernoulli_est.png")
+df1 = DataFrame(pvec=pvec, P=ps[1,:], label="(H)")
+df2 = DataFrame(pvec=pvec, P=ps[2,:], label="(HH)")
+df3 = DataFrame(pvec=pvec, P=ps[3,:], label="(HHT)")
+df4 = DataFrame(pvec=pvec, P=ps[4,:], label="(HHTT)")
+df5 = DataFrame(pvec=pvec, P=ps[5,:], label="(20xH, 20xT)")
+
+df = vcat(df1, df2, df3, df4, df5)
+
+p = plot(df, x=:pvec,y=:P, color=:label, Geom.line)
+
+draw(SVG("bernoulli_est.svg",7inch,5inch),p)
+draw(PS("bernoulli_est.eps",7inch,5inch),p)
