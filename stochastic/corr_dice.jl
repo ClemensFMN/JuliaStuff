@@ -4,7 +4,7 @@ using DataFrames
 
 # throwing two dice N times and recording the number of consecutive dice throws
 # i.e. how often do we throw a 1 followed by a 5?
-N = 100000
+N = 10000
 
 # random dice
 p = DiscreteUniform(1,6)
@@ -13,9 +13,12 @@ p = DiscreteUniform(1,6)
 d = Dict()
 
 for i in 1:N
-    # throw
-    dice = rand(p,2)
-    # println(dice)
+    # (A) throw uncorrelated dice
+    # dice = rand(p,2)
+    # (B) introduce correlation...
+    dice = [0,0]
+    dice[1] = rand(1:6)
+    dice[2] = rand(1:dice[1])
     # get the existing count; if this has not been thrown before, set to 0
     old_count = get!(d, dice, 0)
     # and update the count by one...
@@ -35,7 +38,7 @@ for i in 1:6
     for j in 1:6
         inval[c,1] = i
         inval[c,2] = j
-        outval[c] = d[[i,j]]
+        outval[c] = get(d, [i,j], 0)
         c += 1
     end
 end
