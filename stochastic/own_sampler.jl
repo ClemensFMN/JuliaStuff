@@ -7,7 +7,7 @@ type SimpleDist <: Sampleable{Univariate, Discrete}
 end
 
 # and implements a sampling function...
-function rand(S::SimpleDist)
+function Distributions.rand(S::SimpleDist)
     # this also works without providing the namespace
     p = Distributions.DiscreteUniform(0,S.par)
     # but this REQUIRES the namespace
@@ -31,13 +31,14 @@ type CorrDice <: Sampleable{Multivariate, Discrete}
 end
 
 # length of each sample is two
-Base.length(S::CorrDice) = 2
+Distributions.length(s::CorrDice) = 2
 
 
-function _rand!{T<:Real}(S::CorrDice, x::AbstractVector{T})
-    return(1,1)
+function Distributions._rand!{T<:Real}(s::CorrDice, x::AbstractVector{T})
+    x = [1,1]
+    return(x)
 end
 
 
 p = CorrDice()
-Distributions.rand(p)
+rand(p)
