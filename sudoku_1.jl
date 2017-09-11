@@ -35,17 +35,42 @@ function constProp(brd)
    for pos in board
       ngbVals = Set()
       for n in neighbours[pos]
-         # println("POS", pos, "BRD[POS]", brd[pos])
          if(length(brd[n])==1)
             tmp = brd[n][1]
-            #println(tmp)
             push!(ngbVals, tmp)
          end
       end
-      # println("POS", pos, "ngbVals", ngbVals)
       res[pos] = setdiff(brd[pos], ngbVals)
+      #println("POS", pos, "brd[pos]", brd[pos], "ngbVals", ngbVals, "res[pos]", res[pos])
    end
    res
+end
+
+
+function constPropComplete(brd)
+    bnew = brd
+    changed = true
+    while(changed == true)
+        res = constProp(bnew)
+        changed = bnew != res
+        bnew = res
+    end
+    bnew    
+end
+
+@enum ResultType NotSolvable Solved Ambiguous
+
+function isSolution(brd)
+    brdLength = map(x->length(x), values(brd))
+    brdOnes = map(x->x==1, brdLength)
+    brdZeros = map(x->x==0, brdLength)
+    if(all(brdOnes))
+        return(Solved)
+    elseif(any(brdZeros))
+        return(NotSolvable)
+    else
+        return(Ambiguous)
+    end
 end
 
 
@@ -59,7 +84,6 @@ grps = [(1,2,3),(4,5,6),(7,8,9)]
 neighbours = Dict()
 
 for board_pos in board
-   #board_pos = (4,7)
    curr_r = board_pos[1]
    curr_c = board_pos[2]
 
@@ -71,14 +95,15 @@ for board_pos in board
 
     for grp in grps
       if(curr_c in grp)
-         curr_row_grp = grp
-      end
-      if(curr_r in grp)
          curr_col_grp = grp
       end
+      if(curr_r in grp)
+         curr_row_grp = grp
+      end
    end
+   #println(curr_row_grp, curr_col_grp)
+   
    ngb_grp = [(r,c) for r in curr_row_grp for c in curr_col_grp]
-
    tempSet = Set([ngb_rows; ngb_cols; ngb_grp])
    delete!(tempSet, board_pos)
    neighbours[board_pos] = tempSet
@@ -88,17 +113,20 @@ end
 # taken from the article http://norvig.com/sudoku.html
 # also the first entry in http://norvig.com/easy50.txt
 # this sudoku can be completely solved via constraint propagation...
-brd1 = "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
+#brd1 = "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
 
 # slighlty more DOFs -> not solvable via CP alone
-# val brd1 = "000000000900305001001806400008102900700000008006708200002609500800203009005010300"
+brd1 = "000000000900305001001806400008102900700000008006708200002609500800203009005010300"
 
 problem = parseString(brd1)
 
 printBoard(problem)
 
-res = constProp(problem)
-
-
+#res = constProp(problem)
 println()
+#printBoard(res)
+
+res = constPropComplete(problem)
 printBoard(res)
+
+isSolution(res)
