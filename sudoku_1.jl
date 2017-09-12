@@ -46,18 +46,6 @@ function constProp(brd)
    res
 end
 
-
-function constPropComplete(brd)
-    bnew = brd
-    changed = true
-    while(changed == true)
-        res = constProp(bnew)
-        changed = bnew != res
-        bnew = res
-    end
-    bnew    
-end
-
 @enum ResultType NotSolvable Solved Ambiguous
 
 function isSolution(brd)
@@ -74,7 +62,54 @@ function isSolution(brd)
 end
 
 
+function constPropComplete(brd)
+    bnew = brd
+    changed = true
+    while(changed == true)
+        res = constProp(bnew)
+        changed = bnew != res
+        bnew = res
+    end
+    (bnew, isSolution(bnew))
+end
 
+finished = false
+# i don't understand why finished cannot be used inside the function???!!
+function solveIt(brd)
+   bnew, solution = constPropComplete(brd)
+   result = bnew
+println(finished)
+   if(finished == false)
+      if(solution == Solved)
+         println("Found solution")
+         printBoard(bnew)
+         finished = true
+      elseif(solution == NotSolvable)
+         println("got stuck")
+      else #ambiguous
+         for pos in keys(bnew)
+            if(length(bnew[pos]) > 1)
+               if(!finished)
+                  for cand in bnew[pos]
+                     temp = bnew
+                     temp[pos] = [cand]
+                     solveIt(temp)
+                  end
+               end
+            end
+         end
+      end
+   end
+end
+
+x = 10
+
+function testGlobal()
+   println(neighbours[1,1])
+   println(x)
+end
+
+# some GLOBAL STUFF setting up data structures etc...
 rows_cols = collect(1:9)
 
 board = [(r,c) for r in rows_cols for c in rows_cols]
@@ -122,11 +157,12 @@ problem = parseString(brd1)
 
 printBoard(problem)
 
-#res = constProp(problem)
 println()
-#printBoard(res)
 
-res = constPropComplete(problem)
-printBoard(res)
+#res = constPropComplete(problem)
+#printBoard(res[1])
+#println(res[2])
 
-isSolution(res)
+solveIt(problem)
+
+testGlobal()
