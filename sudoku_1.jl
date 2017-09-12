@@ -74,11 +74,14 @@ function constPropComplete(brd)
 end
 
 finished = false
-# i don't understand why finished cannot be used inside the function???!!
+# in order for the function to be able to use finished in an if statement, the
+# function needs to declare it as global...
+# weird, but that's the way it is according to
+# https://stackoverflow.com/questions/24830074/julia-variable-not-defined
 function solveIt(brd)
+   global finished 
    bnew, solution = constPropComplete(brd)
    result = bnew
-println(finished)
    if(finished == false)
       if(solution == Solved)
          println("Found solution")
@@ -100,13 +103,6 @@ println(finished)
          end
       end
    end
-end
-
-x = 10
-
-function testGlobal()
-   println(neighbours[1,1])
-   println(x)
 end
 
 # some GLOBAL STUFF setting up data structures etc...
@@ -165,4 +161,3 @@ println()
 
 solveIt(problem)
 
-testGlobal()
