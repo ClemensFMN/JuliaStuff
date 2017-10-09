@@ -86,9 +86,9 @@ function solveIt(brd)
       if(solution == Solved)
          println("Found solution")
          printBoard(bnew)
-         finished = true
+         #finished = true
       elseif(solution == NotSolvable)
-         println("got stuck")
+         #println("got stuck")
       else #ambiguous
          for pos in keys(bnew)
             if(length(bnew[pos]) > 1)

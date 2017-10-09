@@ -46,7 +46,7 @@ plotly()
 
 
 
-plot(ndigits, mean(cnt_vec,2))
+# plot(ndigits, mean(cnt_vec,2), lab="", xlabel="digit length a, b", ylabel="avg num divisions", grid=true)
 
-#histogram(cnt_vec[3,:], bins=50)
+histogram(cnt_vec[3,:], bins=50, xlabel="# of divisions", ylabel="# of occurences", lab="", grid=true)
 

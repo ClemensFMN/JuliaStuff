@@ -21,7 +21,7 @@ a = 55
 
 num_div = map(x-> gcd_count(a,x)[2],1:a)
 
-plot(1:a, num_div, xlabel="b", ylabel="num divisions")
+plot(1:a, num_div, xlabel="b", ylabel="num divisions", lab="", grid=true)
 
 #savefig("num_div.png")
 
