@@ -20,13 +20,15 @@ Base.:(==)(p1::ECPoint, p2::ECPoint) = (p1.x == p2.x) && (p1.y == p2.y)
 
 # overload the + operator to work with points on elliptic curves
 function Base.:+(p1::ECPoint, p2::ECPoint)
+    if(p1.s.p != p2.s.p) error("same p required")
     p = p1.s.p
     # TODO check that both p1.s.p and p2.s.p are equal
     if(p1==p2)
         s = (3*p1.x^2 + p1.s.a) * invmod(2*p1.y, p)
         s = mod(s, p)
     else
-        # TODO what happens when p2.x. and p1.x. are equal??
+        # TODO what happens when p2.x. and p1.x. are equal?? then return the identity element, but how do we represent that?
+        # -> the type of ECPoint is not finished...
         s = (p2.y - p1.y) * invmod(p2.x - p1.x, p)
         s = mod(s, p)
     end
