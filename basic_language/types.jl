@@ -29,7 +29,10 @@ end
 println(f1(0))
 println(f1(1))
 
-
+# the function dispatches depending on the type
+# methods(f2) says
+# # 1 method for generic function "f2":
+# f2(x::Union{Id, Point}) in Main at /home/cnovak/src/julia/JuliaStuff/basic_language/types.jl:34
 function f2(x::PointOrId)
     if(typeof(x) == Point)
         return(x.x + x.y)
@@ -43,3 +46,14 @@ pID = Id()
 println(f2(p1))
 println(f2(pID))
 
+# here we define a polymorphic function instead...
+# methods(f3) yields
+# # 2 methods for generic function "f3":
+# f3(x::Id) in Main at /home/cnovak/src/julia/JuliaStuff/basic_language/types.jl:48
+# f3(x::Point) in Main at /home/cnovak/src/julia/JuliaStuff/basic_language/types.jl:47
+
+f3(x::Point) = x.x + x.y
+f3(x::Id) = 0
+
+println(f3(p1))
+println(f3(pID))
