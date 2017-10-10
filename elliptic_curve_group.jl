@@ -61,17 +61,20 @@ end
 
 
 
-#function Base.:+(p1::ECGroupElement, p2::ECGroupElement)
-#    if(p1 == ECId) p2
-#    elseif(p2 == ECId) p1
-#    else
-#        p1 + p2
-#    end
-#end
+function Base.:+(p1::ECGroupElement, p2::ECGroupElement)
+    if(typeof(p1) == ECId)
+        p2
+    elseif(typeof(p2) == ECId)
+        p1
+    else
+        p1 + p2
+    end
+end
 
-Base.:+(p1::ECPoint, p2::ECId) = p1
-Base.:+(p1::ECId, p2::ECPoint) = p2
-Base.:+(p1::ECId, p2::ECId) = ECId()
+# other option for the plus function
+#Base.:+(p1::ECPoint, p2::ECId) = p1
+#Base.:+(p1::ECId, p2::ECPoint) = p2
+#Base.:+(p1::ECId, p2::ECId) = ECId()
 
 
 # based on Understanding Cryptography, Section 9.2
@@ -89,6 +92,7 @@ println(pId + pId)
 println(pId + p1)
 println(p1 + pId)
 
+println("*******************")
 
 pnew = p1
 
