@@ -1,4 +1,4 @@
-
+using Winston
 
 # generate all possible paths starting and ending in the first city
 function alltours(cities)
@@ -69,12 +69,12 @@ function nearest_neighbour_path(city_coord, start)
 end
 
 #number of cities
-N = 7
+N = 10
 # the different cities
 cities = collect(1:N)
 
 
-RUNS = 20
+RUNS = 100
 
 val_opt = zeros(RUNS)
 val_nn = zeros(RUNS)
@@ -107,5 +107,13 @@ for iter in 1:RUNS
 
 end
 
-println([val_opt val_nn 100*(val_nn-val_opt)./val_opt])
+#println([val_opt val_nn 100*(val_nn-val_opt)./val_opt])
+
+x = val_nn./val_opt
+hst = hist(x, 10)
+
+frm = Winston.FramedPlot(title="", xlabel="x", ylabel="Density")
+Winston.add(frm, Winston.Histogram(hst[1], hst[2], color="red"))
+
+
 

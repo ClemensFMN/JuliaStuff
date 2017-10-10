@@ -1,7 +1,7 @@
 using Gadfly
 using Distributions
 
-X = rand(MultivariateNormal([0.0, 0.0], [1.0 0.5; 0.5 1.0]), 10000);
+X = rand(MultivariateNormal([0.0, 0.0], [1.0 1.39; 1.39 2.0]), 10000);
 p = plot(x=X[1,:], y=X[2,:], Geom.hexbin(xbincount=100, ybincount=100))
 
 
