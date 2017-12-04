@@ -1,5 +1,6 @@
 using Plots
 plotly()
+using Distributions
 
 # More special topics...
 
@@ -14,6 +15,16 @@ histogram(x, bins=50)
 
 x = randn(10000); y = randn(10000)
 histogram2d(x,y,nbins=50)
+
+# MVNormal with diagonal covariance
+p1 = MvNormal([1.0, 0.5], [1.0, 1.0])
+x = rand(p1, 1000000)
+histogram2d(x[1,:], x[2,:], nbins=50)
+
+p2 = MvNormal([1.0, 0.5], [1.0 0.8; 0.8 1.0])
+x = rand(p2, 1000000)
+histogram2d(x[1,:], x[2,:], nbins=50)
+
 
 y = randn(10)
 plot(y)
