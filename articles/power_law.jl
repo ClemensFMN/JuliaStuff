@@ -3,7 +3,7 @@ plotly()
 
 using StatsBase
 
-N = 100000
+N = 1000000
 
 alpha = 1.5
 xmin = 2
@@ -11,10 +11,18 @@ xmin = 2
 r = rand(N)
 x = xmin*(1-r).^(-1/(alpha-1))
 
-# histogram(x, bins=50)
+# estimate alpha from the observations
+# true xmin
+alpha_hat = 1 + N / sum(log.(x./xmin))
+println(alpha_hat)
 
-edges = 1:1000
+# "estimate" xmin by taking the minimum value of the observed sequence
+xmin_hat = minimum(x)
+alpha_hat_2 = 1 + N / sum(log.(x./xmin_hat))
+println(alpha_hat_2)
 
-h = fit(Histogram, x, edges)
 
-plot(edges, log10(h.weights), xscale=:log10)
+#edges = 1:1000
+#h = fit(Histogram, x, edges)
+#plot(edges, log10(h.weights), xscale=:log10)
+
