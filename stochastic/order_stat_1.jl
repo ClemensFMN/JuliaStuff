@@ -12,13 +12,13 @@ using StatsBase
 p = Uniform()
 
 # number of RVs
-kmax = 10
+kmax = 3
 # order of RV to consider
-k = 1
+k = 2
 
 # num of trials
 N = 500000
-edges = linspace(-2,2,50)
+edges = linspace(-0.2,1.2,50)
 
 x = rand(p, kmax, N)
 
@@ -35,7 +35,9 @@ t = linspace(0,1)
 # maximum
 #y = kmax*t.^(kmax-1)
 # minimum
-y = kmax*(1-t).^(kmax-1)
+#y = kmax*(1-t).^(kmax-1)
+# k=2 for kmax=3
+y = 6*t.*(1-t)
 plot(t, y)
 # we need to normalize the shit by taking into account the width of the bins
 plot!(edges, hres.weights/N/(edges[2]-edges[1]))
