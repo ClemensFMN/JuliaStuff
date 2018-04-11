@@ -1,10 +1,10 @@
-using Winston
+# using Winston
+using Plots
+plotly()
 
-x = linspace(0, 5, 100)
+x = linspace(1, 20, 20)
 
-y = gamma(x)
+y = pi.^(x/2) ./ (2.^x .* gamma(x/2+1))
 
 
-plot(x, y, "g-")
-grid(true)
-savefig("gamma_plot.png")
+plot(x, y, linecolor=:red, yscale=:log10)
