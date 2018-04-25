@@ -2,7 +2,8 @@ using DifferentialEquations
 using Plots
 plotly()
 
-f(u,p,t) = u*sin(t.^2)
+f(u,p,t) = -u
+
 u0=1.0
 tspan = (0.0,8.0)
 
