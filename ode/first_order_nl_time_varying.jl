@@ -9,7 +9,7 @@ plotly()
 
 f(u,p,t) = u.*sin.(t.^2)
 
-tspan = (0.0,4.0)
+tspan = (0.0,6.0)
 u0 = 1.0
 
 prob = ODEProblem(f,u0,tspan)
@@ -20,4 +20,4 @@ p = plot(sol,linewidth=2,xaxis="time (t)", label="y(t)")
 aval = sin.(sol.t.^2)
 plot!(p, sol.t, aval, label="sin(t^2)")
 
-plot(p)
+plot(p, ylims=(-1., 3.0))
