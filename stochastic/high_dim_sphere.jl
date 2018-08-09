@@ -14,7 +14,7 @@ plotly()
 # for D = 2
 
 D = 10
-Num = 100000
+Num = 1000
 
 samples = zeros(D, Num)
 
@@ -33,17 +33,21 @@ end
 # scatter(samples[1,:], samples[2,:])
 
 
-# dists = []
+dists = Float64[]
+dotprod = Float64[]
 
-# for i1 = 1:Num
-#   for i2 = i1+1:Num
-#     #d = norm(samples[:,i1] - samples[:,i2])
-#     #append!(dists, d)
+for i1 = 1:Num
+  for i2 = i1+1:Num
+    #d = norm(samples[:,i1] - samples[:,i2])
+    #append!(dists, d)
 
-#     d2 = norm(samples[:,i1] - samples[:,i2]).^2
-#     append!(dists, d2)
-#   end
-# end
+    d2 = norm(samples[:,i1] - samples[:,i2]).^2
+    append!(dists, d2)
+
+    dtprd = dot(samples[:,i1], samples[:,i2])
+    append!(dotprod, dtprd)
+  end
+end
 
 # histogram(dists, nbins=100)
 
