@@ -1,34 +1,44 @@
-lst = 4:10
+# ARRAYS
+# ======
 
-# findin(a,b) searches for stuff in a that's in b
-# if b is a single element, it returns all indices in a where the elemtn appears
-ind = findin(lst, 6)
+lst = collect(4:10)
+
+# index is one-based
+println(lst[1])
+
+push!(lst, 100)
+println(lst)
+
+# assignment -> create (additional) reference, NO copy
+lst2 = lst
+lst2[1] = -1
+println(lst, lst2)
+
+lst3 = copy(lst)
+lst[1] = -2
+println(lst, lst3)
+
+
+# findall(pred,xs) searches for stuff in xs for which pred x returns true
+ind = findall(x->x==5, lst)
 println(ind)
 
-ind = findin(lst, 2)
+ind = findall(x->x >7, lst)
 println(ind)
 
-# list comprehension stuff (see more below)
-lst = [x.^2 for x in -5:5]
-ind = findin(lst, 4)
-println(lst, "...", ind)
+# higher-order functions
+res = map(x -> x*x, lst)
+println(res)
 
-# find takes a predicate function and returns the indices of the array where this function returns true
-ind = find(x->x<5, lst)
-println(ind)
+res = filter(x -> x > 50, res)
+println(res)
 
-val = reduce((x,acc)->x + acc, 0, lst)
+res = broadcast(x->x+2, res)
+println(res)
+
+# snytactic sugar for broadcast (instead of using lambdas)
+res2 = res .+ 2
+println(res)
+
+val = reduce((x,acc)->x + acc, lst)
 println(sum(lst), "...", val)
-
-
-# List Comprehensions
-# lst looks much nicer in the REPL
-lst = [(x, x.^2) for x in -5:5]
-println(lst)
-
-lst = [(r,c) for r in 1:3, c in 1:3]
-println(lst)
-
-lst = [r+c for r in 1:3, c in 1:3]
-println(lst)
-lst
