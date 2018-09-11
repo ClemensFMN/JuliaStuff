@@ -1,37 +1,41 @@
 # define an object with its own iterator
 # http://docs.julialang.org/en/stable/manual/interfaces/#man-interfaces-iteration
 
-immutable Squares
+struct Squares
     count::Int
 end
 
-# Base.start(::Squares) = 1
-# shorthand for
-function Base.start(S::Squares)
-    return(1)
+function Base.iterate(S::Squares, state=1)
+  if(state > S.count) # we are above the max value
+    nothing # -> return nothing to indicate we are done
+  else
+    (state*state, state+1) # otherwise, return value and new state
+  end
 end
 
-# Base.next(S::Squares, state) = (state*state, state+1)
-# shorthand for
-function Base.next(S::Squares, state)
-    return(state*state, state+1)
-end
 
-# Base.done(S::Squares, state) = state > S.count;
-# shorthand for
-function Base.done(S::Squares, state)
-    return(state > S.count)
-end
+Base.eltype(::Type{Squares}) = Int
 
-# too lazy for writing out the shorthand
-Base.eltype(::Type{Squares}) = Int # Note that this is defined for the type
-Base.length(S::Squares) = S.count;
+Base.length(S::Squares) = S.count
 
-# *********** Application ***********
+
 for i in Squares(7)
-    println(i)
+  println(i)
 end
 
+println(25 in Squares(100))
 
-println(25 in Squares(10))
-println(mean(Squares(100)), std(Squares(100)))
+# we need getindex for accessing []
+function Base.getindex(S::Squares, i::Int)
+  1 <= i <= S.count || throw(BoundsError(S, i))
+  return i*i
+end
+
+println(Squares(10)[3])
+
+# this to also allow Numbers as index
+Base.getindex(S::Squares, i::Number) = S[convert(Int, i)]
+# and this to allow ranges as indices
+Base.getindex(S::Squares, I) = [S[i] for i in I]
+
+println(Squares(10)[3:6])
