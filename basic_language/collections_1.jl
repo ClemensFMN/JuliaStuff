@@ -23,8 +23,16 @@ println(lst, lst3)
 ind = findall(x->x==5, lst)
 println(ind)
 
+ind = findall(x->x==20, lst) # nothing found -> empty array
+println(ind)
+
 ind = findall(x->x >7, lst)
 println(ind)
+
+# there is also findfirst, which returns nothing if no suitable element can be found
+ind = findfirst(x->x==20, lst)
+@show ind
+
 
 # higher-order functions
 res = map(x -> x*x, lst)
