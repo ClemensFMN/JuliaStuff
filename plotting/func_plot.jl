@@ -2,9 +2,16 @@
 using Plots
 plotly()
 
-x = linspace(1, 20, 20)
+function vol(N)
+  return pi.^(N/2) ./ (gamma(N/2+1))
+end
 
-y = pi.^(x/2) ./ (2.^x .* gamma(x/2+1))
+x = range(0, stop=4, length=100)
 
+# y = vol(x)
 
-plot(x, y, linecolor=:red, yscale=:log10)
+y1 = x.^2
+y2 = sqrt.(x)
+
+plot(x, y1)#, linecolor=:red)#, yscale=:log10)
+#plot!(x,y2, linecolor=:blue)
