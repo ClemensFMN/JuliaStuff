@@ -1,24 +1,20 @@
 # something a bit more advanced: creating Fibonacci numbers
-immutable Fib
+struct Fib
     maxval::Int
 end
 
 
-function Base.start(F::Fib)
-    return((1,1))
-end
-
-function Base.next(F::Fib, state)
-    newstate = (state[1] + state[2], state[1])
-    val = state[1]
-    return((val, newstate))
-end
-
-function Base.done(F::Fib, state)
-    return(state[1] > F.maxval)
+function Base.iterate(F::Fib, state=(1,1))
+  xn, xnm1 = state
+  xnew = xn + xnm1
+  if(xnew > F.maxval) # we are above the max value
+    nothing # -> return nothing to indicate we are done
+  else
+    (xnew, (xnew, xn)) # otherwise, return value and new state
+  end
 end
 
 
-for i in Fib(50)
+for i in Fib(100)
     println(i)
 end

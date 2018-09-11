@@ -1,4 +1,4 @@
-immutable Point
+struct Point
     x :: Float64
     y :: Float64
 end
@@ -13,7 +13,7 @@ p2 = Point(4,5)
 println(dist(p1, p2))
 
 # some kind of "indicator type"
-immutable Id
+struct Id
 end
 
 # defining a union

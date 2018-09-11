@@ -1,4 +1,4 @@
-lst = linspace(0,1,21)
+lst = range(0,stop=1,length=11)
 
 # linspace creates an object not a vector
 println(lst)
