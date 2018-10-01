@@ -1,7 +1,7 @@
 using Plots
 plotly()
 
-x = linspace(-2,2)
+x = range(0, stop=10, length=100)
 y1 = x.^2
 y2 = x.^3
 
@@ -14,7 +14,7 @@ y2 = x.^3
 # plot(x,[y1,y2], title="Test Plot", label=["Line 1", "Line 2"], lw=3)
 
 # or like this
-plot(x,y1,label="Plot 1", linewidth=2, linecolor=:red)
+plot(x,y1,label="Plot 1", linewidth=2, linecolor=:red, size=(800,600))
 plot!(x,y2,label="Plot 2", linewidth=2, linecolor=:blue, linestyle=:dash)
 
 # find attributes as follows: plotattr(:Series)
