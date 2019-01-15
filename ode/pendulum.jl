@@ -9,8 +9,8 @@ const g = 9.81
 L = 1.0
 
 #Initial Conditions
-# u0 = [0.1,0] # small displacement, no initial velocity
-u0 = [1.4,0] # large displacement, no initial velocity
+u0small = [0.1,0] # small displacement, no initial velocity
+u0large = [1.4,0] # large displacement, no initial velocity
 tspan = (0.0,4.0)
 
 #Define the linearized ODE
@@ -33,17 +33,26 @@ end
 
 
 # Pass to solver
-prob_lin = ODEProblem(linearized_pendulum, u0, tspan)
+prob_lin = ODEProblem(linearized_pendulum, u0large, tspan)
 sol_lin = solve(prob_lin,Tsit5())
 
+
+prob_lin2 = ODEProblem(linearized_pendulum, u0large, tspan)
+sol_lin2 = solve(prob_lin2,Tsit5())
+
+
+
 # Pass to solver
-prob_nonlin = ODEProblem(nonlinear_pendulum, u0, tspan)
+prob_nonlin = ODEProblem(nonlinear_pendulum, u0large, tspan)
 sol_nonlin = solve(prob_nonlin,Tsit5())
 
 
 # Plot
 plot(sol_lin,linewidth=2,title ="Simple Pendulum Problem", xaxis = "Time", yaxis = "Height", label = ["Theta","dTheta"])
+
 plot!(sol_nonlin,linewidth=2,title ="Simple Pendulum Problem", xaxis = "Time", yaxis = "Height", label = ["Theta","dTheta"])
+
+# plot!(sol_lin2,linewidth=2,title ="Simple Pendulum Problem", xaxis = "Time", yaxis = "Height", label = ["Theta","dTheta"])
 
 # "result" small displacement has a smaller period than large one...
 # can we somehow measure the period?
