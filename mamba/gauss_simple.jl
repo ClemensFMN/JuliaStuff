@@ -1,4 +1,6 @@
 using Mamba
+using LinearAlgebra
+
 
 N = 5
 sw2 = 0.1
@@ -6,7 +8,8 @@ sx2 = 1
 
 model = Model(
     # I THINK, this is a bit mean here as MvNormal requires sw2
-    y = Stochastic(1,(x) -> MvNormal(x*ones(N), sw2*eye(N)) ),
+    # y = Stochastic(1,(x) -> MvNormal(x*ones(N), sw2*eye(N)) ),
+    y = Stochastic(1,(x) -> MvNormal(x*ones(N), sw2 * Matrix{Float64}(I, N, N))),
     # sw2 = Logical( () -> 1), - does NOT work...
     # but Normal takes \sigma_x and NOT \sigma_x^2
     x = Stochastic( () -> Normal(0,sqrt(sx2)))
