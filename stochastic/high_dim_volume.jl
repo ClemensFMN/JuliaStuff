@@ -2,7 +2,7 @@ using Distributions
 
 
 # number of dimensions
-N = 10
+N = 3
 
 # distribution for "unit cube"
 d = Uniform(-1.,1.)

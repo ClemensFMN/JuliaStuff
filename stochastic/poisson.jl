@@ -37,13 +37,16 @@ end
 num_points
 
 # means
-println("simulation: ", mean(num_points))
-println("analytical result: ", window / r)
+println("mean arrivals, simulation: ", mean(num_points))
+println("mean arrivals, analytical result: ", window / r)
 
 # probs
 
 for k = 1:10
-    println(k)
-    println( (window/r)^k * exp(-window/r)/factorial(k) )
-    println( length(findall(x->x==k, num_points))/RUNS )
+
+    ana = (window/r)^k * exp(-window/r)/factorial(k)
+    sim = length(findall(x->x==k, num_points))/RUNS
+    
+    println("k: ", k, " simulation: ", sim, " analytical result: ", ana)
+
 end
