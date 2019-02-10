@@ -11,7 +11,9 @@ distNorm = Normal(0,1)
 
 res = zeros(length(dvec))
 
-for (j, d) in enumerate(dvec)
+#for (j, d) in enumerate(dvec)
+
+d = 5
 
     dotprd = zeros(RUNS)
 
@@ -26,11 +28,11 @@ for (j, d) in enumerate(dvec)
         dotprd[i] = dot(x1, x2)
      end
 
-     res[j] = mean(abs(dotprd))
-     println(d, "....", res[j])
+     #res[j] = mean(abs(dotprd))
+     #println(d, "....", res[j])
 
-end
+#end
 
-res
+#res
 
 # semilogx(dvec, res)

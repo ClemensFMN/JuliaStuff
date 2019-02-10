@@ -1,42 +1,18 @@
-# https://fluxml.ai/Flux.jl/stable/models/basics/
+using LinearAlgebra
 
-using Flux.Tracker
-using Flux.Tracker: update!
-using Random
+# we have a simple linear regression problem y = kx+d
 
-Random.seed!(0)
+k = 1.2
+d = 0.5
 
+x = [0,1,2,3,4]
+ytrue = k*x .+ d
 
-k = rand(1,1)
-d = rand(1,1)
+# stack a vector with ones on the left for the bias term
+xones = [x [1,1,1,1,1]]
 
-#println(k,d)
+# alternative formulation for y
+yobs = xones*[k;d] + 0.01*randn(5,1)
 
-predict(x) = k.*x .+ d
-
-function loss(x, y)
-  ŷ = predict(x)
-  sum((y .- ŷ).^2)
-end
-
-
-
-x = [0, 1, 2, 3]
-y = 0.2*x .+ 0.5# + 0.01*randn(4,1)
-
-k = param(k)
-d = param(d)
-
-
-for i=1:500
-  gs = Tracker.gradient(() -> loss(x, y), Params([k]))
- 
-  deltak = gs[k]
-  update!(k, -0.01*deltak)
-  deltad = gs[d]
-  update!(d, -0.01*deltad)
-
-  #println(deltak)#, deltad)
-
-  println(i,k,d, loss(x,y))
-end
+# and estimate the params using pseudo inverse
+theta_hat = pinv(xones)*yobs
