@@ -1,5 +1,5 @@
 using Distributions
-using IterTools
+#using IterTools
 
 # simulate a symmetic MC with two states 0 & 1
 # p(0|0) = p & p(1|0) = 1-p

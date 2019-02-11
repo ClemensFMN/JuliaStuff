@@ -3,7 +3,7 @@ using IterTools
 
 # function for generating a sequence from a markov chain
 function mc_sample_path(P; init=1, sample_size=1000)
-    X = Array{Int64}(sample_size) # allocate memory
+    X = zeros(Int8, sample_size) # allocate memory
     X[1] = init
     # === convert each row of P into a distribution === #
     n = size(P)[1]
@@ -43,8 +43,8 @@ println("mean length of zero sequences ", mean(zeroLength), "\nmean length of on
 println("analytical ", p1/(1-p1), "  ", p2/(1-p2))
 
 # obtain the total number of 0s and 1s...
-println(length(find(x->x==1, stateSeq))/N)
-println(length(find(x->x==2, stateSeq))/N)
+#println(length(findall(x->x==1, stateSeq))/N)
+#println(length(findall(x->x==2, stateSeq))/N)
 
-d,v=eig(P')
-println("analytical ", v[:,2]/sum(v[:,2]))
+# d,v=eig(P')
+# println("analytical ", v[:,2]/sum(v[:,2]))
