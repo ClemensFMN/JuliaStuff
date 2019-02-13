@@ -1,32 +1,15 @@
 using Distributions
 using IterTools
 
-# function for generating a sequence from a markov chain
-function mc_sample_path(P; init=1, sample_size=1000)
-    X = zeros(Int8, sample_size) # allocate memory
-    X[1] = init
-    # === convert each row of P into a distribution === #
-    n = size(P)[1]
-    P_dist = [Categorical(vec(P[i,:])) for i in 1:n]
-
-    # === generate the sample path === #
-    for t in 1:(sample_size - 1)
-        X[t+1] = rand(P_dist[X[t]])
-    end
-    return X
-end
-
-# simulate an MC with two states 0 & 1
-# p(1|1) = p1 & p(2|1) = 1-p1
-# p(2|2) = p2 & p(1|2) = 1-p2
-
+include("MarkovStuff.jl")
+import .MarkovStuff
 
 p1 = 0.15
 p2 = 0.3
 P = [p1 1-p1; 1-p2 p2]
 N = 1000000
 
-stateSeq = mc_sample_path(P, sample_size=N)
+stateSeq = MarkovStuff.mc_sample_path(P, sample_size=N)
 
 # we are interested in the average length of 0- and 1-sequences
 # first we group the state sequence into groups of the same value
@@ -43,8 +26,7 @@ println("mean length of zero sequences ", mean(zeroLength), "\nmean length of on
 println("analytical ", p1/(1-p1), "  ", p2/(1-p2))
 
 # obtain the total number of 0s and 1s...
-#println(length(findall(x->x==1, stateSeq))/N)
-#println(length(findall(x->x==2, stateSeq))/N)
+println(length(findall(x->x==1, stateSeq))/N)
+println(length(findall(x->x==2, stateSeq))/N)
 
-# d,v=eig(P')
-# println("analytical ", v[:,2]/sum(v[:,2]))
+P^10

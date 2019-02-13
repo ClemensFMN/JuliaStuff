@@ -2,25 +2,8 @@ using Distributions
 using IterTools
 using LinearAlgebra
 
-# function for generating a sequence from a markov chain. it generates sample_size states or
-# stops when the current state = stop
-function mc_sample_path(P; init=1, stop=-1, sample_size=1000)
-    X = zeros(Int8, sample_size) # allocate memory
-    X[1] = init
-    # === convert each row of P into a distribution === #
-    n = size(P)[1]
-    P_dist = [Categorical(vec(P[i,:])) for i in 1:n]
-
-    # === generate the sample path === #
-    for t in 1:(sample_size - 1)
-        newval = rand(P_dist[X[t]])
-        X[t+1] = newval
-        if(newval == stop) # stop when current sample = stop value
-            return X[1:t+1] # and return the truncated state sequence
-        end
-    end
-    return X
-end
+include("MarkovStuff.jl")
+import .MarkovStuff
 
 
 # 4 state MC with absorbing state 4
@@ -37,7 +20,7 @@ meanStateVisit = zeros(Int8, RUNS)
 
 
 for i in 1:RUNS
-    stateSeq = mc_sample_path(P, init=1, stop=4) # start at 1, stop at 4
+    stateSeq = MarkovStuff.mc_sample_path(P, init=1, stop=4) # start at 1, stop at 4
     meanStateVisit[i] = length(findall(x->x==countState, stateSeq)) 
 end
 
