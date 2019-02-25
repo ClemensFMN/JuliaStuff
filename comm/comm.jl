@@ -1,10 +1,11 @@
 using Distributions
 
-N = int(1e6)
-L = 1
+
+N = 10_000_000
+L = 3
 
 SNRvec = -10:4:20
-sw2vec = 10.^(-SNRvec/10)
+sw2vec = 10 .^ (-SNRvec ./ 10)
 
 bdist = Bernoulli(0.5)
 hdist = Normal(0, 1)
@@ -17,7 +18,7 @@ for snr_iter = 1:length(SNRvec)
 	wdist = Normal(0, sw2)
 
 	b = rand(bdist, N)
-	x = 2*b-1
+	x = 2*b.-1
 
 	bhat = zeros(N)
 
@@ -31,7 +32,7 @@ for snr_iter = 1:length(SNRvec)
 
 	end
 
-	errs = length(find(bhat.!=x))
+	errs = length(findall(bhat.!=x))
 
 	println(errs/N)
 	BER[snr_iter] = errs/N
@@ -40,5 +41,5 @@ end
 
 print(BER)
 
-writedlm("L$L.csv", [SNRvec BER])
+# save("BER_L_1.jld", "BER", BER)
 
