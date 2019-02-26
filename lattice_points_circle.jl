@@ -12,7 +12,7 @@ function cnt_lattice_points(N)
 	for x = 1:N-1
 		y = sqrt(N^2 - x^2)
 		#println(x, " -> ", y)
-		if(floor(y) == y) then
+		if(floor(y) == y)
 			cnt += 1
 		end
 	end
