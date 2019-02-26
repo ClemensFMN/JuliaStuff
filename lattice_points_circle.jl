@@ -9,7 +9,7 @@
 function cnt_lattice_points(N)
 
 	cnt = 0
-	for x = 1:N-1
+	for x = 1:N-1 # we do not include the x=0 and x=N as we multiply the rational points by 4 and add 4
 		y = sqrt(N^2 - x^2)
 		#println(x, " -> ", y)
 		if(floor(y) == y)
@@ -25,11 +25,15 @@ function cnt_lattice_points(N)
 
 end
 
+cnt_res = Dict{Int64, Int64}()
 
-
-for N = 1:20
+for N = 2:20_000
 
 	cnt = cnt_lattice_points(N)
-	println(N, " --> ", cnt)
+	#println(N, " --> ", cnt)
+
+  cnt_res[N] = cnt
 
 end
+
+findmax(cnt_res)
