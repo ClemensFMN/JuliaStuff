@@ -6,13 +6,19 @@ using LinearAlgebra
 
 # Irregular Sampling based on Channel Estimation in Wireless OFDM Systems with irregular Pilot Distribution
 
-N = 10
-n = 1:N
+# the trick to get it finally working was to consider a low-pass spreading function
+# with finite support
 
-strue = zeros(Complex{Float64},N)
-strue[1] = 1+1im
+N = 64
+n = 1:N
+K = 7 # support of the spreading function
+
+strue = zeros(Complex{Float64},K)
+strue[1] = 1
 strue[2] = 1.5+0.4im
 strue[3] = -0.4
+strue[6] = -0.4
+strue[7] = 1.5-0.4im
 
 #plot(x)
 # plot(abs.(fft(x)))
@@ -26,30 +32,31 @@ for i=1:N
   end
 end
 
+# the spreading function is low-pass; it is non-zero at low & high indices
+ind_low = 1:convert(Int, ceil(K/2)) # the first K/2+1 bins (that includes the DC part)
+ind_high = N-convert(Int, floor(K/2))+1:N # the upper most K/2 bins which are the mirrored lower freqs
+V = V[:,[ind_low; ind_high]] # selecting the relevant cols from V
+
+
 # num and position of irregularly spaced samples
-ind_sample = [1,5,10]
+ind_sample = [1,2,3,4,30,60,62,64]
 Np = length(ind_sample)
 
-P = zeros(Int, Np, N)
 
+P = zeros(Int, Np, N)
+# setting the pilot matrix to one at pilot positions
 for i=1:Np
 	P[i,ind_sample[i]] = 1
 end
 
-
 Vp = P*V
-# htrue = V * strue
-# hp = P*htrue
-
 hp = Vp*strue
 
-# does not work
+# directly inverting the normal equations
 shat = inv(Vp'*Vp) * Vp' * hp
 
-# the condition number is more or less infinite -> the matrix does not seem to be invertible...
+# condition number
 # eigen(Vp'*Vp)
-
-
 
 
 T = Vp' * Vp
@@ -57,14 +64,14 @@ hpre = Vp' * hp
 
 
 function conjGrad(T, ypre)
-
 	a = ypre
 	b = ypre
 	c = T*b
 	alpha_prev = norm(a)^2
-	shat_prev = zeros(10)
+	K,_ = size(T)
+	shat_prev = zeros(K)
 
-	for i = 1:10
+	for i = 1:50
 		beta = alpha_prev / (b' * c)
 		shat_cur = shat_prev + beta*b
 		a = a - beta * c
