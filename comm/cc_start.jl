@@ -4,6 +4,8 @@ mutable struct ConvCode
 	g 	# code polynomials - CAREFUL: they are stored as ints and NOT OCTALs!!
 	K   # number of output streams
 	nState # next state matrix - see below
+	pState # previous state matrix - see below
+	stateState # state-state transition - see below
 	outP # output matrix - see below
 	function ConvCode(g)
 		K = length(g)
@@ -24,6 +26,41 @@ mutable struct ConvCode
 			nState[i+1,1] = temp | 0
 			nState[i+1,2] = temp | 1
 		end
+
+		# pState matrix
+		# row = current state
+		# col 1,2 = prev state which lead to current state, independent of input
+		pState = zeros(Int,2^nShiftRegs,2)
+		for k=0:3
+			ind = [] # wild hack :-(
+			for b=1:2
+				append!(ind, findall(x->x==k, nState[:,b]))
+			end
+			pState[k+1,:] = ind.-1
+		end
+
+
+		# stateState matrix
+		# row = previous state
+		# col = next state
+		# value = information bit, which caused the state transition
+		# some state transitions are not possible, in this case they are 0 as well...
+		# we use this at the end of the viterbi to obtain a seq of inf.bits from a state seq
+		# and the viterbi produces only valid state transitions, this is ok (i guess)
+		stateState = zeros(Int,2^nShiftRegs,2^nShiftRegs)
+
+		for i=0:3
+			temp = nState[i+1,:]
+			for j=0:3
+				ind = findall(x->x==j, temp)
+				if(!isempty(ind))
+					stateState[i+1,j+1] = ind[1]-1 # also pretty ugly... when we find something, it has length 1
+				end
+			end
+		end
+
+
+
 		# output matrix
 		# dim-1 = current state
 		# dim-2 = input
@@ -42,7 +79,7 @@ mutable struct ConvCode
 				outp[i+1, 2, gi] = o
 			end
 		end
-		new(g, K, nState, outp)
+		new(g, K, nState, pState, stateState, outp)
 	end
 end
 
