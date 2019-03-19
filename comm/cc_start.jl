@@ -119,3 +119,60 @@ inf_bits = [1,0,0,0,0,0,0]
 code_bits = encode(c, inf_bits)
 
 
+# viterbi - beginning
+
+# initialization
+pMetric = [0 1000 1000 1000] # metric from previous state
+paths = [[0], [1], [2], [3]]
+
+
+# TODO: iterate over time
+# consider time t=0
+r = [1,0] # the received code bit at time t
+
+tempMetric = copy(pMetric)
+
+for cState = 0:3 # the current state
+
+	@show cState
+
+	pState = c.pState[cState+1,:] # corresponding previous states
+
+	curpState = pState[1] # select option 1 for previous state
+	@show curpState
+	if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
+		cw = c.outP[curpState+1,1,:]
+	else # an inf.bit=1 cause the state transition
+		cw = c.outP[curpState+1,2,:]
+	end
+	@show cw
+	metric_update = sum(abs.(cw - r)) # calculate the metric update
+	@show metric_update
+	cand_1 = pMetric[curpState+1] + metric_update # and calculate an updated metric
+	@show cand_1
+
+	curpState = pState[2] # select option 2 for previous state
+	@show curpState
+	if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
+		cw = c.outP[curpState+1,1,:]
+	else # an inf.bit=1 cause the state transition
+		cw = c.outP[curpState+1,2,:]
+	end
+	@show cw
+	metric_update = sum(abs.(cw - r))
+	@show metric_update
+	cand_2 = pMetric[curpState+1] + metric_update
+	@show cand_2
+
+	if(cand_1 < cand_2) # choose candidate1 path
+		append!(paths[cState+1], pState[1])
+		tempMetric[cState+1] = cand_1
+	else
+		append!(paths[cState+1], pState[2])
+		tempMetric[cState+1] = cand_2
+	end
+	@show tempMetric
+end
+
+pMetric = copy(tempMetric)
+
