@@ -3,6 +3,7 @@
 mutable struct ConvCode
 	g 	# code polynomials - CAREFUL: they are stored as ints and NOT OCTALs!!
 	K   # number of output streams
+	nShiftRegs # number of shift registers
 	nState # next state matrix - see below
 	pState # previous state matrix - see below
 	stateState # state-state transition - see below
@@ -79,7 +80,7 @@ mutable struct ConvCode
 				outp[i+1, 2, gi] = o
 			end
 		end
-		new(g, K, nState, pState, stateState, outp)
+		new(g, K, nShiftRegs, nState, pState, stateState, outp)
 	end
 end
 
@@ -115,64 +116,96 @@ g2 = 0o7
 
 c = ConvCode([g1, g2])
 
-inf_bits = [1,0,0,0,0,0,0]
+# inf_bits = [1,0,0,0,0,0,0]
+inf_bits = [1,1,0,0,1,0,1,0]
 code_bits = encode(c, inf_bits)
 
 
 # viterbi - beginning
+function viterbi(c::ConvCode, r)
+	# initialization
+	pMetric = [0 1000 1000 1000] # metric initialization. start state = 0 -> initial metric = 0; all other metrics = "infinity" 
+	paths = [[], [], [], []] # for every state we initialize an empty array
 
-# initialization
-pMetric = [0 1000 1000 1000] # metric from previous state
-paths = [[0], [1], [2], [3]]
+	Nrseq = length(rseq)
 
+	for time = 1:2:Nrseq # run through the sequence of received bits
 
-# TODO: iterate over time
-# consider time t=0
-r = [1,0] # the received code bit at time t
+		r = rseq[time:time+1] # the received code bits at time t
+		#@show r
+		tempMetric = copy(pMetric) # copy the current metric away. in the following loop, we update tempMetric
+		tempPaths = deepcopy(paths) # copy the current paths away. since it is an array of arrays, we need(?) to use deepcopy
 
-tempMetric = copy(pMetric)
+		for cState = 0:2^c.nShiftRegs-1 # the current state
+			#@show cState
 
-for cState = 0:3 # the current state
+			pState = c.pState[cState+1,:] # the previous states leading into cState
+			#@show pState
+			curpState = pState[1] # select option 1 for previous state
+			#@show curpState
+			if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
+				cw = c.outP[curpState+1,1,:]
+			else # an inf.bit=1 cause the state transition
+				cw = c.outP[curpState+1,2,:]
+			end
+			#@show cw
+			metric_update = sum(abs.(cw - r)) # calculate the metric update
+			#@show metric_update
+			cand_1 = pMetric[curpState+1] + metric_update # and calculate an updated metric
+			#@show cand_1
 
-	@show cState
+			curpState = pState[2] # select option 2 for previous state
+			#@show curpState
+			if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
+				cw = c.outP[curpState+1,1,:]
+			else # an inf.bit=1 cause the state transition
+				cw = c.outP[curpState+1,2,:]
+			end
+			#@show cw
+			metric_update = sum(abs.(cw - r))
+			#@show metric_update
+			cand_2 = pMetric[curpState+1] + metric_update
+			#@show cand_2
 
-	pState = c.pState[cState+1,:] # corresponding previous states
+			if(cand_1 < cand_2) # choose candidate1 path
+				temp = deepcopy(paths[pState[1]+1]) # path to previous state
+				append!(temp, pState[1]) # append chosen previous state
+				tempPaths[cState+1] = temp # update the path
+				tempMetric[cState+1] = cand_1
+			else
+				#println("choose cand_2")
+				temp = deepcopy(paths[pState[2]+1])
+				append!(temp, pState[2])
+				tempPaths[cState+1] = temp
+				tempMetric[cState+1] = cand_2
+			end
+		end
 
-	curpState = pState[1] # select option 1 for previous state
-	@show curpState
-	if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
-		cw = c.outP[curpState+1,1,:]
-	else # an inf.bit=1 cause the state transition
-		cw = c.outP[curpState+1,2,:]
+		pMetric = copy(tempMetric) # copy back the metric
+		paths = deepcopy(tempPaths) # copy back the paths
+		
 	end
-	@show cw
-	metric_update = sum(abs.(cw - r)) # calculate the metric update
-	@show metric_update
-	cand_1 = pMetric[curpState+1] + metric_update # and calculate an updated metric
-	@show cand_1
+	#@show pMetric
+	#@show paths
 
-	curpState = pState[2] # select option 2 for previous state
-	@show curpState
-	if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
-		cw = c.outP[curpState+1,1,:]
-	else # an inf.bit=1 cause the state transition
-		cw = c.outP[curpState+1,2,:]
-	end
-	@show cw
-	metric_update = sum(abs.(cw - r))
-	@show metric_update
-	cand_2 = pMetric[curpState+1] + metric_update
-	@show cand_2
+	_, ind = findmin(pMetric) # find the minimum metric
+	resPath = paths[ind[2]] # and corresponding path
+	append!(resPath, ind[2]-1)
+	#@show resPath
 
-	if(cand_1 < cand_2) # choose candidate1 path
-		append!(paths[cState+1], pState[1])
-		tempMetric[cState+1] = cand_1
-	else
-		append!(paths[cState+1], pState[2])
-		tempMetric[cState+1] = cand_2
+	inf_bits_hat = zeros(Int, convert(Int, Nrseq/2))
+
+	for i=1:length(resPath)-1 # now run through the state transitions
+		ps = resPath[i]
+		ns = resPath[i+1]
+		#@show ps, ns
+		inf_bits_hat[i] = c.stateState[ps+1, ns+1] # and re-obtain the inf bit sequence
 	end
-	@show tempMetric
+	inf_bits_hat
 end
 
-pMetric = copy(tempMetric)
+
+rseq = [1,1, 1,0, 0,0, 1,0, 1,1, 0,1, 0,0, 0,1]
+ss = viterbi(c, rseq)
+
 
