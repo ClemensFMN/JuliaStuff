@@ -1,6 +1,6 @@
 # convolutional code functions
 
-mutable struct ConvCode
+struct ConvCode
 	g::Array{Int, 1} 	# code polynomials - CAREFUL: they are stored as ints and NOT OCTALs!!
 	K::Int   # number of output streams
 	nShiftRegs::Int # number of shift registers
@@ -32,7 +32,7 @@ mutable struct ConvCode
 		# row = current state
 		# col 1,2 = prev state which lead to current state, independent of input
 		pState = zeros(Int,2^nShiftRegs,2)
-		for k=0:3
+		for k=0:2^nShiftRegs-1
 			ind = [] # wild hack :-(
 			for b=1:2
 				append!(ind, findall(x->x==k, nState[:,b]))
@@ -50,9 +50,9 @@ mutable struct ConvCode
 		# and the viterbi produces only valid state transitions, this is ok (i guess)
 		stateState = zeros(Int,2^nShiftRegs,2^nShiftRegs)
 
-		for i=0:3
+		for i=0:2^nShiftRegs-1
 			temp = nState[i+1,:]
-			for j=0:3
+			for j=0:2^nShiftRegs-1
 				ind = findall(x->x==j, temp)
 				if(!isempty(ind))
 					stateState[i+1,j+1] = ind[1]-1 # also pretty ugly... when we find something, it has length 1
@@ -288,27 +288,28 @@ g2 = 0o7
 c = ConvCode([g1, g2])
 
 # inf_bits = [1,0,0,0,0,0,0]
-inf_bits = [1,1,0,0,1,0,1,0]
+inf_bits = [1,1,0,0,1,0,1,0,0,0,0]
 code_bits = encode(c, inf_bits)
 
-rseq = [1,1, 1,0, 0,0, 1,0, 1,1, 0,1, 0,0, 0,1]
-ss1 = viterbi(c, rseq)
+# rseq = [1,1, 1,0, 0,0, 1,0, 1,1, 0,1, 0,0, 0,1] # example from book
+rseq = code_bits
+# ss1 = viterbi(c, rseq)
 ss2 = viterbi_2(c, rseq)
 
-using Profile
-using ProfileView
+# using Profile
+# using ProfileView
 
 # performance fun
-function perf1(N)
-	g1 = 0o5
-	g2 = 0o7
-	c = ConvCode([g1, g2])
-	inf_bits = rand(0:1, N)
-	@time code_bits = encode(c, inf_bits)
-	# @time viterbi(c, code_bits)
-	@time inf_bits_hat = viterbi_2(c, code_bits)
-	sum(abs.(inf_bits-inf_bits_hat))
-end
+# function perf1(N)
+# 	g1 = 0o5
+# 	g2 = 0o7
+# 	c = ConvCode([g1, g2])
+# 	inf_bits = rand(0:1, N)
+# 	@time code_bits = encode(c, inf_bits)
+# 	# @time viterbi(c, code_bits)
+# 	@time inf_bits_hat = viterbi_2(c, code_bits)
+# 	sum(abs.(inf_bits-inf_bits_hat))
+# end
 
 # perf1()
 # Profile.clear()
