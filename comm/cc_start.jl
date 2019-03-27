@@ -110,94 +110,12 @@ function encode(cc::ConvCode, inf_bits)
 end
 
 
-# viterbi decoder
-function viterbi(c::ConvCode, rseq)
-	# initialization
-	pMetric = [0 1000*ones(1,2^c.nShiftRegs-1)] # metric initialization. start state = 0 -> initial metric = 0; all other metrics = "infinity" 
-	paths = [[], [], [], []] # for every state we initialize an empty array
-
-	Nrseq = length(rseq)
-
-	for time = 1:convert(Int, Nrseq/2) # run through the sequence of received bits
-
-		r = rseq[2*time-1:2*time] # the received code bits at time t
-		#@show r
-		tempMetric = copy(pMetric) # copy the current metric away. in the following loop, we update tempMetric
-		tempPaths = deepcopy(paths) # copy the current paths away. since it is an array of arrays, we need(?) to use deepcopy
-
-		for cState = 0:2^c.nShiftRegs-1 # the current state
-			#@show cState
-
-			pState = c.pState[cState+1,:] # the previous states leading into cState
-			#@show pState
-			curpState = pState[1] # select option 1 for previous state
-			#@show curpState
-			if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
-				cw = c.outP[curpState+1,1,:]
-			else # an inf.bit=1 cause the state transition
-				cw = c.outP[curpState+1,2,:]
-			end
-			#@show cw
-			metric_update = sum(abs.(cw - r)) # calculate the metric update
-			#@show metric_update
-			cand_1 = pMetric[curpState+1] + metric_update # and calculate an updated metric
-			#@show cand_1
-
-			curpState = pState[2] # select option 2 for previous state
-			#@show curpState
-			if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
-				cw = c.outP[curpState+1,1,:]
-			else # an inf.bit=1 cause the state transition
-				cw = c.outP[curpState+1,2,:]
-			end
-			#@show cw
-			metric_update = sum(abs.(cw - r))
-			#@show metric_update
-			cand_2 = pMetric[curpState+1] + metric_update
-			#@show cand_2
-
-			if(cand_1 < cand_2) # choose candidate1 path
-				temp = deepcopy(paths[pState[1]+1]) # path to previous state
-				append!(temp, pState[1]) # append chosen previous state
-				tempPaths[cState+1] = temp # update the path
-				tempMetric[cState+1] = cand_1
-			else
-				#println("choose cand_2")
-				temp = deepcopy(paths[pState[2]+1])
-				append!(temp, pState[2])
-				tempPaths[cState+1] = temp
-				tempMetric[cState+1] = cand_2
-			end
-		end
-
-		pMetric = copy(tempMetric) # copy back the metric
-		paths = deepcopy(tempPaths) # copy back the paths
-		
-	end
-	#@show pMetric
-	#@show paths
-
-	_, ind = findmin(pMetric) # find the minimum metric
-	resPath = paths[ind[2]] # and corresponding path
-	append!(resPath, ind[2]-1)
-	#@show resPath
-
-	inf_bits_hat = zeros(Int, convert(Int, Nrseq/2))
-
-	for i=1:length(resPath)-1 # now run through the state transitions
-		ps = resPath[i]
-		ns = resPath[i+1]
-		#@show ps, ns
-		inf_bits_hat[i] = c.stateState[ps+1, ns+1] # and re-obtain the inf bit sequence
-	end
-	inf_bits_hat
-end
 
 
 
 
-# viterbi decoder - faster than viterbi, as it uses a pre-allocated path array
-function viterbi_2(c::ConvCode, rseq)
+# viterbi decoder for AWGN channels
+function viterbi_awgn(c::ConvCode, rseq)
 	
 	Nrseq = length(rseq)
 	Niseq = convert(Int, floor(Nrseq/2))
@@ -226,7 +144,9 @@ function viterbi_2(c::ConvCode, rseq)
 				cw = c.outP[curpState+1,2,:]
 			end
 			#@show cw
-			metric_update = sum(abs.(cw - r)) # calculate the metric update
+			#@show r
+			#metric_update = sum(abs.(cw - r)) # calculate the metric update for BSC
+			metric_update = sum((cw - r).^2) # calculate the metric update for AWGN
 			#@show metric_update
 			cand_1 = pMetric[curpState+1] + metric_update # and calculate an updated metric
 			#@show cand_1
@@ -239,7 +159,8 @@ function viterbi_2(c::ConvCode, rseq)
 				cw = c.outP[curpState+1,2,:]
 			end
 			#@show cw
-			metric_update = sum(abs.(cw - r))
+			#metric_update = sum(abs.(cw - r))
+			metric_update = sum((cw - r).^2)
 			#@show metric_update
 			cand_2 = pMetric[curpState+1] + metric_update
 			#@show cand_2
@@ -283,18 +204,18 @@ end
 
 
 
-g1 = 0o5
-g2 = 0o7
-c = ConvCode([g1, g2])
+#g1 = 0o5
+#g2 = 0o7
+#c = ConvCode([g1, g2])
 
 # inf_bits = [1,0,0,0,0,0,0]
-inf_bits = [1,1,0,0,1,0,1,0,0,0,0]
-code_bits = encode(c, inf_bits)
-
+#inf_bits = [1,1,0,0,1,0,1,0,0,0,0]
+#code_bits = encode(c, inf_bits)
+	
 # rseq = [1,1, 1,0, 0,0, 1,0, 1,1, 0,1, 0,0, 0,1] # example from book
-rseq = code_bits
+#rseq = code_bits
 # ss1 = viterbi(c, rseq)
-ss2 = viterbi_2(c, rseq)
+#ss2 = viterbi(c, rseq)
 
 # using Profile
 # using ProfileView
