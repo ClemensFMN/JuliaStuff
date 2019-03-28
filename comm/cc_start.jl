@@ -204,6 +204,82 @@ end
 
 
 
+
+# viterbi decoder for AWGN channels
+function viterbi_awgn_2(c::ConvCode, rseq)
+	
+	Nrseq = length(rseq)
+	Niseq = convert(Int, floor(Nrseq/2))
+	# initialization
+	pMetric = [0 1000*ones(1,2^c.nShiftRegs-1)] # metric initialization. start state = 0 -> initial metric = 0; all other metrics = "infinity" 
+	paths = zeros(Int, 2^c.nShiftRegs, Niseq+1) # path[state,path over time]
+	paths[:, 1] = 0:2^c.nShiftRegs-1 # we initialize the start poin of each path
+#@show paths
+
+	newpMetric = copy(pMetric) # copy the current metric. in the following loop, we update newMetric
+	newPaths = copy(paths) # copy the current paths. in the following, we update newPaths and used paths
+
+
+	for time = 1:Niseq # run through the sequence of received bits. The initial state is at time = 1, therefore @ time we augment the state with time+1
+		r = rseq[2*time-1:2*time] # the received code bits at time t
+		#@show r
+		for cState = 0:2^c.nShiftRegs-1 # the current state
+			pState = c.pState[cState+1,:] # the previous states leading into cState
+			curpState = pState[1] # select option 1 for previous state
+			if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
+				cw = c.outP[curpState+1,1,:]
+			else # an inf.bit=1 cause the state transition
+				cw = c.outP[curpState+1,2,:]
+			end
+			#metric_update = sum(abs.(cw - r)) # calculate the metric update for BSC
+			metric_update = sum((cw - r).^2) # calculate the metric update for AWGN
+			cand_1 = pMetric[curpState+1] + metric_update # and calculate an updated metric
+
+			curpState = pState[2] # select option 2 for previous state
+			if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
+				cw = c.outP[curpState+1,1,:]
+			else # an inf.bit=1 cause the state transition
+				cw = c.outP[curpState+1,2,:]
+			end
+			#metric_update = sum(abs.(cw - r))
+			metric_update = sum((cw - r).^2)
+			cand_2 = pMetric[curpState+1] + metric_update
+
+			if(cand_1 < cand_2) # choose candidate1 path
+				temp = copy(paths[pState[1]+1,1:time]) # copy the path ending in pState[1] into temp
+				append!(temp, cState) # add the current state to the path (at time+1)
+				newPaths[cState+1,1:time+1] = temp # and update the path leading to the current state
+				newpMetric[cState+1] = cand_1 # update the metric
+			else
+				temp = copy(paths[pState[2]+1,1:time])
+				append!(temp, cState)
+				newPaths[cState+1,1:time+1] = temp
+				newpMetric[cState+1] = cand_2
+			end
+		end
+		pMetric = copy(newpMetric) # copy back the metric
+		paths = copy(newPaths) # copy back the paths
+		# @show time, paths, pMetric
+	end
+	# we are done - now find the minimum-metric path through the trellis
+	_, ind = findmin(pMetric) # find the minimum metric
+	resPath = paths[ind[2],:] # and corresponding path
+	# @show resPath
+	# follow the resulting path and collect the information bits which led to the corresponding state transfer
+	inf_bits_hat = zeros(Int, Niseq)
+	for i=1:length(resPath)-1
+		ps = resPath[i]
+		ns = resPath[i+1]
+		# @show ps, ns
+		inf_bits_hat[i] = c.stateState[ps+1, ns+1] # and re-obtain the inf bit sequence
+	end
+	inf_bits_hat
+end
+
+
+
+
+
 #g1 = 0o5
 #g2 = 0o7
 #c = ConvCode([g1, g2])
