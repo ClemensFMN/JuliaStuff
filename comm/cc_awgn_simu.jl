@@ -20,8 +20,8 @@ using Distributions
 SNRdB = 3 #0:2:20
 sw2vec = 1/(2*1/2) * 10 .^ (-SNRdB / 10) # that's the noise power per transmitted bit. something is maybe wrong here?
 
-N = 32
-RUNS  = 5000 #5000
+N = 256
+RUNS  = 10_000 #5000 #5000
 #g1 = 0o31
 #g2 = 0o27
 #g1 = 0o13
@@ -44,21 +44,21 @@ for (ind, sw2) in enumerate(sw2vec)
 	for i in 1:RUNS
 		inf_bits = rand(0:1, N)
 #@show inf_bits
-		#inf_bits[N-10:N] = zeros(11) # zero padding
+		inf_bits[N-10:N] = zeros(11) # zero padding
 		code_bits = encode(c, inf_bits)# encoding
 		s = 2 * code_bits .- 1 # BPSK modulation: 0 -> -1, 1 -> 1
 	# @show s
 		rec_syms = s + rand(ndist, 2*N) # AWGN channel
 	# @show rec_syms
 		code_bits_demod = (rec_syms .+ 1)/2 # "soft" demodulation
-		inf_bits_hat = viterbi_awgn(c, code_bits_demod)  # both viterbi implementations perform the same...
-		inf_bits_hat_2 = viterbi_awgn_2(c, code_bits_demod)
+		# inf_bits_hat = viterbi_awgn(c, code_bits_demod)  # both viterbi implementations perform the same...
+		#inf_bits_hat = viterbi_awgn_2(c, code_bits_demod)
+		inf_bits_hat = viterbi_awgn_zeropad(c, code_bits_demod)
 #@show inf_bits_hat
 		err_i[ind, i] = sum(abs.(inf_bits-inf_bits_hat)) / length(inf_bits)
-		err_i_2[ind, i] = sum(abs.(inf_bits-inf_bits_hat_2)) / length(inf_bits)
 	end
 
 end
 
 println(mean(err_i,dims=2))
-println(mean(err_i_2,dims=2))
+# println(mean(err_i_2,dims=2))
