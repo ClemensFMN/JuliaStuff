@@ -300,6 +300,10 @@ function viterbi_awgn_zeropad(c::ConvCode, rseq)
 		for cState = 0:2^c.nShiftRegs-1 # the current state
 			pState = c.pState[cState+1,:] # the previous states leading into cState
 			curpState = pState[1] # select option 1 for previous state
+			# TODO: other idea - maybe simpler (requires no if)
+			# inf_bit = c.stateState[curpState, cState]
+			# cw = c.outP[curpState, inf_bit,:]
+
 			if(c.nState[curpState+1,1] == cState) # an inf.bit=0 caused the state transition
 				cw = c.outP[curpState+1,1,:]
 			else # an inf.bit=1 cause the state transition
