@@ -26,18 +26,21 @@ using Distributions
 # this is not done here...
 # for N = 2046, the BER is 0.00330078 \approx the IT++ result from above
 
-SNRdB = 3 #0:2:20
-sw2vec = 1/(2*1/2) * 10 .^ (-SNRdB / 10) # that's the noise power per transmitted bit. something is maybe wrong here?
+# update: we zero-pad and infbits and consider an end state of zero in viterbi_awgn_zeropad
+# -> BER does not depend on N anymore and results are the same with IT++ :-)
+
+SNRdB = -2:6
+sw2vec = 1/(2*1/2) * 10 .^ (-SNRdB / 10) # that's the noise power per transmitted bit
 
 N = 256
-RUNS  = 10_000 #5000 #5000
+RUNS  = 5_000 #5000 #5000
 
 #g1 = 0o31
 #g2 = 0o27
 #g1 = 0o13
 #g2 = 0o17
-g1 = 0o5
-g2 = 0o7
+g1 = 0o13
+g2 = 0o17
 
 
 c = ConvCode([g1, g2])
