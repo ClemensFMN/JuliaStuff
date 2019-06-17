@@ -1,6 +1,6 @@
 using StatsBase
 
-s = open("test.txt")
+s = open("ping_result.txt")
 res = readlines(s)
 times = parse.(Float64, res)
 
