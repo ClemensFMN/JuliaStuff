@@ -1,4 +1,6 @@
 using Distributions
+using Plots
+plotly()
 
 N = 100_000
 
@@ -22,8 +24,13 @@ println(l2 / (l1 + l2))
 
 
 # this should be exponential with l1 + l2
-x = min.(x1, x2)
+# x = min.(x1, x2)
+
+# this is not exponential :-)
+x = max.(x1, x2)
 
 for a in 0:0.1:1.0
 	println(count(x .< a) / N, "...", 1 - exp(-(l1+l2)*a)) # minimum check using CDF...
 end
+
+histogram(x)
