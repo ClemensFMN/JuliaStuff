@@ -1,17 +1,23 @@
 using DataFrames
 
-# assume we have two tables with time series
-# ID is actually a date
-# i.e. for date = 1 we have values,
-# but at date=2, only set a has a vaue and at date=3, only set b has a value
+people = DataFrame(ID = [20, 40], Name = ["John Doe", "Jane Doe"])
+jobs = DataFrame(ID = [20, 40], Job = ["Lawyer", "Doctor"])
 
-a=DataFrame(ID=[1,2], Val=[10,12]);
-b=DataFrame(ID=[1,3], Val=[20,30]);
+println(join(people, jobs, on = :ID))
 
-# to get a table with all dates (even if they are missing in one of the series), we use an outer join
-jout = join(a,b,on=:ID,kind=:outer)
-println(jout)
+# 6 join types
+# consider now
+jobs = DataFrame(ID = [20, 60], Job = ["Lawyer", "Astronaut"])
 
-# the other side is a table which contain only values which are contained in both tables
-jin = join(a,b,on=:ID,kind=:inner)
-println(jin)
+join(people, jobs, on = :ID, kind = :inner)
+join(people, jobs, on = :ID, kind = :left)
+join(people, jobs, on = :ID, kind = :right)
+join(people, jobs, on = :ID, kind = :outer)
+join(people, jobs, on = :ID, kind = :semi)
+join(people, jobs, on = :ID, kind = :anti)
+
+# finally a cross-product
+join(people, jobs, kind = :cross, makeunique = true)
+
+jobs = DataFrame(newID = [20, 60], Job = ["Lawyer", "Astronaut"])
+join(people, jobs, on = :ID => :newID, kind = :inner)
