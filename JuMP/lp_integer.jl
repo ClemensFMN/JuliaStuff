@@ -1,16 +1,19 @@
 using JuMP
+using GLPK
+
+model = Model(with_optimizer(GLPK.Optimizer))
+
+@variable(model, 0 <= x <= 5, Int)
+@variable(model, 0 <= y <= 5, Int)
 
 
-m = Model()
+@objective(model, Max, 5x + 3y)
+@constraint(model, con, x <= y)
 
-@defVar(m, 0 <= x <= 2, Int)
-@defVar(m, 0 <= y <= 2, Int)
+println(model)
 
-#@setObjective(m, Max, x + y )
+optimize!(model)
+println(termination_status(model))
 
-status = solve(m)
-
-println("Objective value: ", getObjectiveValue(m))
-println("x = ", getValue(x))
-println("y = ", getValue(y))
-
+println(objective_value(model))
+println("x = ", value(x), " y = " ,value(y))
