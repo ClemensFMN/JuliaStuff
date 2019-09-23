@@ -35,12 +35,10 @@ sw2vec = 1/(2*1/2) * 10 .^ (-SNRdB / 10) # that's the noise power per transmitte
 N = 256
 RUNS  = 5_000 #5000 #5000
 
-#g1 = 0o31
-#g2 = 0o27
-#g1 = 0o13
-#g2 = 0o17
-g1 = 0o13
-g2 = 0o17
+g1 = 0o64
+g2 = 0o74
+#g1 = 0o5
+#g2 = 0o7
 
 
 c = ConvCode([g1, g2])

@@ -5,7 +5,7 @@ using StatsPlots
 alpha = 0.4
 beta = 1
 n = 10
-p = 0.3
+# p = 0.3
 
 # Define a simple Gaussian model with unknown mean (having uniform prior) and known variance
 @model my_model(y) = begin

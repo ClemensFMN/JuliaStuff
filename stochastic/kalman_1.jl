@@ -64,7 +64,7 @@ for tme = 1:N
 	# @show sigmap[:,:,tme+1]
 end
 
-ind = 2
+ind = 1
 plot(1:N, xf[ind,:])
 plot!(1:N, xtrue[ind,:])
 

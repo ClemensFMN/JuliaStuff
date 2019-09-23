@@ -5,7 +5,7 @@ plotly()
 N = 100_000
 
 l1 = 1.0
-l2 = 2.0
+l2 = 1.0
 
 
 p1 = Exponential(1/l1)
@@ -27,10 +27,14 @@ println(l2 / (l1 + l2))
 # x = min.(x1, x2)
 
 # this is not exponential :-)
-x = max.(x1, x2)
+# x = max.(x1, x2)
 
-for a in 0:0.1:1.0
-	println(count(x .< a) / N, "...", 1 - exp(-(l1+l2)*a)) # minimum check using CDF...
-end
+#for a in 0:0.1:1.0
+#	println(count(x .< a) / N, "...", 1 - exp(-(l1+l2)*a)) # minimum check using CDF...
+#end
 
+#histogram(x)
+
+x = x1 .+ x2
 histogram(x)
+
