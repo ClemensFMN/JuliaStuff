@@ -34,7 +34,7 @@ phi2 = atan(-C[3,1]/C[1,1])
 R2 = [cos(phi2) 0 -sin(phi2); 0 1 0; sin(phi2) 0 cos(phi2)]
 R2*C
 
-# another order & this WORKS
+# this is actually the "correct" order
 phi2 = atan(-A[3,1]/A[1,1])
 R2 = [cos(phi2) 0 -sin(phi2); 0 1 0; sin(phi2) 0 cos(phi2)]
 B = R2*A
