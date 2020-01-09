@@ -2,53 +2,78 @@ using LinearAlgebra
 
 A=[1 4 6;-2 5 10;4 2 -5]
 
-# order 1
-phi1 = atan(-A[2,1]/A[1,1])
-R1 = [cos(phi1) -sin(phi1) 0; sin(phi1) cos(phi1) 0; 0 0 1]
-B = R1*A
+function getR(theta,m,i,j)
+    R = Matrix(1.0I,m,m)
+    R[i,i] = 0
+    R[j,j] = 0
+    R[j,j]= cos(theta)
+    R[j,i] = sin(theta)
+    R[i,j] = -sin(theta)
+    R[i,i] = cos(theta)
+    return R
+end
 
-phi2 = atan(-B[3,1]/B[1,1])
-R2 = [cos(phi2) 0 -sin(phi2); 0 1 0; sin(phi2) 0 cos(phi2)]
-C = R2*B
+# zero out A[3,1] by G(2,3,theta1)
+i=2
+j=3
+k=1
+theta = atan(- A[j,k]/A[i,k])
+R1 = getR(theta,3,i,j)
 
-phi3 = atan(-C[3,2]/C[2,2])
-R3 = [1 0 0; 0 cos(phi3) -sin(phi3); 0 sin(phi3) cos(phi3)]
-R3*C
+A = R1*A
+
+# zero out A[2,1] by G(1,2,theta2)
+i=1
+j=2
+k=1 # column to zero
+theta = atan(- A[j,k]/A[i,k])
+R2 = getR(theta,3,i,j)
+
+A = R2*A
 
 
-Q = (R3*R2*R1)'
-R = R3*R2*R1*A
+# zero out A[3,2] by G(2,3,theta3)
+i=2
+j=3
+k=2 # column to zero
+theta = atan(- A[j,k]/A[i,k])
+R3 = getR(theta,3,i,j)
+
+A = R3*A
 
 
-# another order of the rotations (keep in mind that the rotation angles are DIFFERENT)
-# but this does NOT work
-phi3 = atan(-A[3,2]/A[2,2])
-R3 = [1 0 0; 0 cos(phi3) -sin(phi3); 0 sin(phi3) cos(phi3)]
-B = R3*A
 
-phi1 = atan(-B[2,1]/B[1,1])
-R1 = [cos(phi1) -sin(phi1) 0; sin(phi1) cos(phi1) 0; 0 0 1]
-C = R1*B
+# right oder, but wrong rotations
+#A=[1 4 6;-2 5 10;4 2 -5]
 
-phi2 = atan(-C[3,1]/C[1,1])
-R2 = [cos(phi2) 0 -sin(phi2); 0 1 0; sin(phi2) 0 cos(phi2)]
-R2*C
+# zero A[3,1]
+#i=1
+#j=3
+#k=1 # column to zero
+#theta = atan(- A[j,k]/A[i,k])
+#R = getR(theta,3,i,j)
 
-# this is actually the "correct" order
-phi2 = atan(-A[3,1]/A[1,1])
-R2 = [cos(phi2) 0 -sin(phi2); 0 1 0; sin(phi2) 0 cos(phi2)]
-B = R2*A
+#A = R*A
 
-phi1 = atan(-B[2,1]/B[1,1])
-R1 = [cos(phi1) -sin(phi1) 0; sin(phi1) cos(phi1) 0; 0 0 1]
-C = R1*B
+# zero A[2,1]
+#i=1
+#j=2
+#k=1
+#theta = atan(- A[j,k]/A[i,k])
+#R = getR(theta,3,i,j)
 
-phi3 = atan(-C[3,2]/C[2,2])
-R3 = [1 0 0; 0 cos(phi3) -sin(phi3); 0 sin(phi3) cos(phi3)]
-S = R3*C
+#A = R*A
 
-Q = (R3*R1*R2)'
-R = R3*R1*R2*A
+# zero A[3,2]
+#i=1
+#j=3
+#k=2
+#theta = atan(- A[j,k]/A[i,k])
+#R = getR(theta,3,i,j)
+
+#A = R*A
+
+
 
 
 # qr(A)
