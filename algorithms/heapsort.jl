@@ -26,8 +26,33 @@ function dft(h, i)
     end
 end
 
+function toDot(h, i)
+    function intern(h,i)
+        # take a heap and convert it in a dot-language description. make a png via dot name.dot -Tpng > name.png
+        if(left(i) <= h.heapsize) # if a left node exists, continue with there
+            println(h.A[i], " -> ", h.A[left(i)], ";")
+        end
 
+        if(right(i) <= h.heapsize) # if a right node exists, continue there
+            println(h.A[i], " -> ", h.A[right(i)], ";")
+        end
+
+        if(left(i) <= h.heapsize) # if a left node exists, continue with there
+            intern(h, left(i))
+        end
+
+        if(right(i) <= h.heapsize) # if a right node exists, continue there
+            intern(h, right(i))
+        end
+    end
+    println("digraph BST {");
+    intern(h,i)
+    println("}")
+end
+    
 function max_heapify(H, i)
+    #@show i
+    #toDot(H, 1)
     # Exchanges H.A[i], H.A[left(i)], and H.A[right(i)] so that H.A[i] \geq H.A[left(i)] & H.A[i] \geq H.A[right(i)]
     # Assumes that binary trees rooted at H.A[left(i)] and H.A[right(i)] are max-heaps    
     l = left(i)
@@ -51,6 +76,9 @@ function build_max_heap(H)
     # build a max-heap from a heap H
     for i in convert(Int, floor(H.size/2)):-1:1 # start at the leaves of the tree and work upward
         max_heapify(H,i)
+        #@show i
+        #toDot(H,1)
+        
     end
 end
 
@@ -60,13 +88,20 @@ function heap_sort(H)
         H.A[1], H.A[i] = H.A[i], H.A[1]
         H.heapsize = H.heapsize - 1
         max_heapify(H,1)
+        @show i
+        toDot(H,1)
     end
 end
 
 
 
-h = Heap([16, 4, 10, 14, 7, 9, 3, 2, 8, 1])
+# h = Heap([16, 4, 10, 14, 7, 9, 3, 2, 8, 1])
+# max_heapify(h, 2)
 
+# h = Heap([4,1,3,2,16,9,10,14,8,7])
+# toDot(h,1)
+# build_max_heap(h)
 
-
-
+h = Heap([16,14,10,8,7,9,3,2,4,1])
+toDot(h,1)
+heap_sort(h)
