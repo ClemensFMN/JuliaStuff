@@ -18,7 +18,6 @@ function buildTree(s)
     nodes = Set{String}() # a set containing all nodes
     for l in s
         res = split(l, ")") # split the string into parent & child
-        @show res
         parent = res[1]
         child = res[2]
         push!(nodes, parent)
@@ -38,30 +37,112 @@ function buildTree(s)
 end
 
 function walkTree(tree)
-
+    # visit everynode & count the length from the root
     function iter(root)
+        # that's the actual recursive work function
         children = tree[root]
-        #@show root, children
         for c in children
-            if c != ""
-                dists[c] = dists[root] + 1
+            if c != "" # is this a child?
+                dists[c] = dists[root] + 1 # calculate the child's distance & store it in result dictionary
                 iter(c)
             end
         end
     end
-
     dists = Dict{String, Int}()
-    strt = "COM"
-    dists["COM"] = 0
+    strt = "COM" # start point
+    dists["COM"] = 0 # with distance 0
     iter(strt)
     dists
 end
 
 
+function searchTree(tree, node)
+    # depth-first search of tree to locate node & keep track of path root - node (this does not work yet)
+    function iter(root)
+        children = tree[root] # children of current root
+        #@show children
+        for c in children # iterate over them
+            #@show c
+            if(c == node)
+                push!(pth, c) # store them in our path
+                return # we have found the point & are done
+            elseif(c != "")
+                push!(pth, c) # store them in our path
+                iter(c) # we have not found it & continue
+            end
+            #if(c!="") # TODO - this does not work... in case we go up, we need to remove 
+            #    #@show pth
+            #    pop!(pth)
+            #end
+        end
+    end
+    pth = Vector{String}()
+    push!(pth, "COM")
+    iter("COM")
+    pth
+end
 
-        
+function listAllPaths(tree)
+    # we run over all nodes & track the path from the root to the node
+    function iter(root)
+        children = tree[root]
+        for c in children
+            if c != "" # is this a real child?
+                pths[c] = [pths[root] ; c] # update the path
+                iter(c)
+            end
+        end
+    end
+    pths = Dict{String, Vector{String}}()
+    pths["COM"] = [] # start at COM
+    iter("COM")
+    pths
+end
+
+function findCommonPoint(pth1, pth2)
+    # assume both paths start at same node and run together until a "last common point". return index of last common point
+    ind = 0
+    for k=1:length(pth1)
+        if(pth1[k] != pth2[k]) # continue as long as the paths are the same
+            ind = k # if not, then return the index of the last equal point
+            break
+        end
+    end
+    ind
+end
+
+
+function findParent(tree, node)
+    # find the parent of a node
+    parent = ""
+    for (prnt, chld) in tree
+        if(node in chld)
+            parent = prnt
+            break
+        end
+    end
+    parent
+end
+
+
+function traceBackward(tree, node)
+    # start at node and go up the tree until the root. Collect all visited nodes in a vector
+    prnt = findParent(tree, node)
+    pth = Vector{String}()
+    push!(pth, node)
+    while(prnt != "COM")
+        push!(pth, prnt)
+        prnt = findParent(tree, prnt)
+    end
+    push!(pth, "COM")
+    pth
+end
+
+
+
+
     
-
+# part 1 input
 #s = "COM)B
 #B)C
 #C)D
@@ -73,6 +154,30 @@ end
 #E)J
 #J)K
 #K)L"
+
+# part 2 input
+#                         YOU
+#                         /
+#        G - H       J - K - L
+#       /           /
+#COM - B - C - D - E - F
+#               \
+#                I - SAN
+
+
+#s = "COM)B
+#B)C
+#C)D
+#D)E
+#E)F
+#B)G
+#G)H
+#D)I
+#E)J
+#J)K
+#K)L
+#K)YOU
+#I)SAN"
 
 s = "21X)BWV
 YZJ)YLQ
@@ -2381,10 +2486,36 @@ RDG)VGN
 F1D)5X5
 3CT)6CH"
 
+
 s = split(s, "\n")
 
 t = buildTree(s)
 res = walkTree(t)
 
 # part 1
-sum(values(res))
+#sum(values(res))
+
+
+# part 2 - early idea
+# simplest would be to start @ node YOU & make a tree search to node SAN
+# the "problem" is, that the tree is rooted @ node COM & we cannot start a tree search from elsewhere...
+# what we can do, however, is to make (i) a tree search from COM to YOU and (ii) a tree search from COM to SAN and record these two paths
+# for a while these two paths will be the same, but split at some node N.
+# the distance between YOU & SAN is the distance between N & YOU and N & SAN.
+
+# option 1
+#pths = listAllPaths(t) # interestingly, this is quite fast. option 2 below is more efficient, but this option seems ok too :-)
+
+#pth1 = pths["YOU"]
+#pth2 = pths["SAN"]
+
+# cmmn = findCommonPoint(pth1, pth2) # find the index of the common point
+# res = (length(pth1) - cmmn) + (length(pth2) - cmmn) # and obtain the number of orbitals betwen YOU & SAN
+
+# option 2
+
+pth1 = traceBackward(t, "YOU")
+pth2 = traceBackward(t, "SAN")
+
+cmmn = findCommonPoint(reverse(pth1), reverse(pth2)) # find the index of the common point
+res = (length(pth1) - cmmn) + (length(pth2) - cmmn) # and obtain the number of orbitals betwen YOU & SAN
