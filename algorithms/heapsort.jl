@@ -93,6 +93,30 @@ function heap_sort(H)
     end
 end
 
+# priority queue stuff
+function heap_extract_max(H)
+    max = H.A[1]
+    H.A[1] = H.A[H.heapsize]
+    H.heapsize = H.heapsize-1
+    max_heapify(H, 1)
+    return max
+end
+
+function heap_increase_key(H,i,key)
+    H.A[i] = key
+    while(i>1 && H.A[parent(i)] < H.A[i])
+        H.A[i], H.A[parent(i)] = H.A[parent(i)], H.A[i]
+        i = parent(i)
+    end
+end
+
+
+function heap_insert_key(H, key)
+    H.heapsize = H.heapsize + 1
+    H.A[H.heapsize] = -10000
+    heap_increase_key(H, H.heapsize, key)
+end
+
 
 
 # h = Heap([16, 4, 10, 14, 7, 9, 3, 2, 8, 1])
@@ -102,6 +126,20 @@ end
 # toDot(h,1)
 # build_max_heap(h)
 
-h = Heap([16,14,10,8,7,9,3,2,4,1])
+#h = Heap([16,14,10,8,7,9,3,2,4,1])
+#toDot(h,1)
+#heap_sort(h)
+
+
+h = Heap([4,1,3,2,16,9,10,14,8,7])
+build_max_heap(h)
 toDot(h,1)
-heap_sort(h)
+println(heap_extract_max(h))
+toDot(h,1)
+
+# a bit careful here - we increase H.A[9] (which was previously 1) to 12
+heap_increase_key(h, 9, 12)
+toDot(h,1)
+
+heap_insert_key(h,100)
+toDot(h,1)
