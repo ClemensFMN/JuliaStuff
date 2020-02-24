@@ -67,7 +67,7 @@ function bfs_struct(G, s)
 
     while(!isempty(Q)) # do while queue is not empty
         u = dequeue!(Q)
-        @show u
+        # @show u
         for adj in G[u]
             if(vertices[adj].color == White) # not visited?
                 vertices[adj].color = Grey
@@ -80,6 +80,42 @@ function bfs_struct(G, s)
     end
     return vertices
 end
+
+
+function printTree(bfs_tree, s, v)
+    # print the vertices along the path (obtained via the bfs procedure) from vertex s to vertex v
+    if(s == v)
+        println(s)
+        return
+    elseif(bfs_tree[v].parent == "")
+        println("no path")
+    else
+        printTree(bfs_tree, s, bfs_tree[v].parent)
+        println(v)
+    end
+end
+
+function buildTree(bfs_tree, s, v)
+    # store the vertices along the path (obtained via the bfs procedure) from vertex s to vertex v
+    function iter(v)
+        if(s == v)
+            push!(tree, s)
+            return
+        elseif(bfs_tree[v].parent == "")
+            error("No path")
+        else
+            iter(bfs_tree[v].parent)
+            push!(tree, v)
+        end
+    end
+
+    tree = Vector{String}()
+    iter(v)
+    return tree
+end
+
+    
+
 
 
 # the example graph from Cormen et al, Fig. 22.3
@@ -99,3 +135,11 @@ println(prnt)
 
 res = bfs_struct(G, "s")
 println(res)
+
+
+println("*************")
+printTree(res, "s", "y")
+
+
+tree1 = buildTree(res, "s", "y")
+println(tree1)
