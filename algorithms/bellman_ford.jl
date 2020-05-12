@@ -45,7 +45,7 @@ end
 function bellman_ford(G, s, weight_mtx)
     # Bellman-For algorithm
     init_single_source(G, s)
-    for i = 1:length(G.vertices)
+    for i = 1:length(G.vertices)-1
         for (u,v) in G.edges
             relax(G, u, v, weight_mtx)
         end
@@ -101,5 +101,16 @@ weight_mtx = [0  1  3  2  0  0  # 1
 #relax(G, 1, 4, weight_mtx)
 
 # execute the Bellman Ford algorithm
+bellman_ford(G, 1, weight_mtx)
+println(G)
+
+
+# now for fun a graph with a negative weight cycle - requires removing the check for negative weight cycles 
+G = Graph([Vertex(1), Vertex(2)], [(1,2), (2,1)])
+weight_mtx = [0  3
+             -5  0]
+
+
+
 bellman_ford(G, 1, weight_mtx)
 println(G)
