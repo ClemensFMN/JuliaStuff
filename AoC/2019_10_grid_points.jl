@@ -13,18 +13,15 @@ struct Point
 end
 
 
-base = Point(0, 0)
+mxcoord = 5
 
-mxcoord = 10
-
-as = [Point(p,q) for p in 1:mxcoord for q in 1:mxcoord]
+as = [Point(p,q) for p in 1:mxcoord for q in -mxcoord:mxcoord]
 
 
 angles = Dict{Point, Float64}()
 
 for a in as
-    # angles[a] = atan(a.y - base.y, base.x - a.x) # bloddy trial & error :-(
-    angles[a] = atan(a.y - base.y, a.x - base.x) # bloddy trial & error :-(
+    angles[a] = atan(a.y, a.x) # bloddy trial & error :-(
 end
 
 # order the shit by increasing angles
@@ -36,4 +33,4 @@ labelvec = [string(i) for i in 1:length(res)]
 
 
 # plot(xvec,yvec, seriestype=:scatter, series_annotations=labelvec)
-plot(xvec,yvec, series_annotations=labelvec, xlim=(0,mxcoord+1), ylim=(0,mxcoord+1))
+plot(xvec,yvec, series_annotations=labelvec, xlim=(0,mxcoord+1), ylim=(-mxcoord-1,mxcoord+1))
