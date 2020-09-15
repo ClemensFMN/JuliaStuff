@@ -1,7 +1,4 @@
-#using DataFrames
-#using DataFramesMeta
 
-using DataStructures
 
 """
     Point
@@ -130,19 +127,14 @@ as = getAsteroids(pos)
 
 # base = Point(4, 9)
 # base = Point(14, 12)
+# this base point is the solution of part 1
 base = Point(23, 18)
 
-# idea
-# calc angle between y-axis and all asteroids
-# sort asteroids by angle AND distance from laser
-# TODO latest idea is to use a DataFrame with 4 columns:
-# Point, angle & distance from basepoint, status ("there" / "destroyed")
-# then we sort along angle & dist
-# we need to iterate across the result as follows
-# 1 take element with smallest angle, smallest distance & mark as "destroyed"
-# 2 chose element with second smallest angle & mark as 
+"""
+    myangle(p::Point)
 
-
+Calculate the angle between a line from base to p and the y-axis. Funny twist is that the range of the function is 0...2pi
+"""
 function myangle(p::Point)
     temp = atan(p.y - base.y, base.x - p.x) # bloddy trial & error :-(
     if(temp < 0.0) # yes -> the asteroid is left from the base point
@@ -151,6 +143,7 @@ function myangle(p::Point)
     temp
 end
 
+# test results for base = Point(4, 9)
 # julia> myangle(Point(1,9)) -> 0.0
 # julia> myangle(Point(4,15)) -> 1.5707963267948966
 # julia> myangle(Point(8,9)) - 3.141592653589793
@@ -160,65 +153,77 @@ end
 
 dist(p::Point) = (p.x - base.x)^2 + (p.y - base.y)^2
 
-# at the end of the day, we want a dict mapping angles to arrays of points. the array will hold all points having the same angle and is ordered by decreasing distance
-# angle => [Point(1,2), Point(2,4)]
-as_dic = Dict{Float64, Array{Point,1}}()
+# Idea: We want a dict mapping angles to arrays of points. Several points (asteroids) will have the same angle, therefore
+# we have an array of points
+# in the array, the points are ordered by decreasing distance
+# the algorithm looks like this
+# take the smallest angle & shoot (remove) innermost point
+# take next angle & continue
 
-# go over all asteroids
-for a in as
-    ang = myangle(a)
-    temp = get(as_dic, ang, [])
-    push!(temp, a) # and add the current asteroid to the list of asteroids already associated with this angle
-    as_dic[myangle(a)] = temp
+"""
+    make-as_dic(as)
+
+takes the list of asteroids, and creates an array of pairs. First pair element is the angle, second pair element is an array
+of asteroids having this angle. The array is sorted by distance.
+"""
+function make_as_dic(as)
+    # The array will hold all points having the same angle and is ordered by decreasing distance
+    as_dic = Dict{Float64, Array{Point,1}}()
+
+    # go over all asteroids and store them in the as_dic dictionary
+    for a in as
+        ang = myangle(a) # get angle
+        temp = get(as_dic, ang, [])
+        push!(temp, a) # and add the current asteroid to the list of asteroids already associated with this angle
+        as_dic[myangle(a)] = temp
+    end
+
+    # now sort the array according to distance
+    for a in keys(as_dic)
+        ps = as_dic[a]
+        #@show ps, dist.(ps)
+        sort!(ps, by=(e -> dist(e)), rev=true) # we sort the list for a specific angle by distance from base point
+        #@show ps, dist.(ps)
+        as_dic[a] = ps
+    end
+
+    # we need to sort by angle. Not sure if Dict is sorted, so we use an array instead
+    ks = keys(as_dic)
+    as_fin = sort(collect(as_dic), by=x->x[1]) # that's the array of pairs we want to work on (angle, Array{Point})
+    as_fin
 end
 
 
-for a in keys(as_dic)
-    ps = as_dic[a]
-    #@show ps, dist.(ps)
-    sort!(ps, by=(e -> dist(e)), rev=true) # we sort the list for a specific angle by distance from base point
-    #@show ps, dist.(ps)
-    as_dic[a] = ps
-end
-
-
-ks = keys(as_dic)
-as_fin = sort(collect(as_dic), by=x->x[1]) # that's the array of pairs we want to work on (angle, Array{Point})
 
 
 # go over the circle one round, pop the asteroid from each list (that's the one being closest to the base point)
 function one_round(as_fin)
     result = Array{Point, 1}()
-    for (ind,a) in enumerate(as_fin)
+    for a in as_fin
         tmp = a[2]
-        if(!isempty(tmp))
+        if(!isempty(tmp)) # we must NOT change the array during iteration -> so we have to check whether the array is not empy
             p = pop!(tmp)
             # @show p
             push!(result, p)
         end
-        #if(isempty(tmp)) # it does not seem to be allowed to change the array while iterating over it... so we leave the array intact but need to ensure that we only pop when the array is non-empty...
-        #    popat!(as_fin, ind)
-        #end
     end
     result
 end
 
+# rotate the laser as long as asteroids are there...
 function shootthemall(as_fin)
     result = Array{Point, 1}()
 
-    # while(!isempty(as_fin)) # go on with rotating as long there are points there... 
-    for i = 1:5
+    while(!isempty(as_fin)) # go on with rotating as long there are points there
         tmp = one_round(as_fin) # one round of shooting
         append!(result, tmp) # store the result
-        as_fin = filter(x -> !isempty(x[2]), as_fin) # now we 
-#        println("*********************")
-#        @show i
-#        @show as_fin
+        as_fin = filter(x -> !isempty(x[2]), as_fin) # and remove all elements with empty arrays...
     end
     result
 end
 
 
+as_fin = make_as_dic(as)
 res = shootthemall(as_fin)
 
 
