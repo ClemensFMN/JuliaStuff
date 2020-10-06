@@ -70,6 +70,7 @@ function bfs_struct(G, s)
         # @show u
         for adj in G[u]
             if(vertices[adj].color == White) # not visited?
+                println(adj)
                 vertices[adj].color = Grey
                 vertices[adj].d = vertices[u].d + 1
                 vertices[adj].parent = u
@@ -129,9 +130,9 @@ G = Dict(["v" => ["r"],
           "y" => ["x", "u"]])
 
 
-dist, prnt = bfs_dict(G, "s")
-println(dist)
-println(prnt)
+#dist, prnt = bfs_dict(G, "s")
+#println(dist)
+#println(prnt)
 
 res = bfs_struct(G, "s")
 println(res)

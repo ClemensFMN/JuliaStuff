@@ -54,3 +54,11 @@ t1 = Node([Node(4), Node(5)], 2)
 t2 = Node([Node(6), Node(7)], 3)
 t = Node([t1, t2], 1)
 
+
+tnew = Node([Node([Node(4), Node(5)], 2), 
+       Node([Node(6), Node(7)], 3)],
+       1)
+
+DFS_recursive(tnew)
+DFS_stack(tnew)
+BFS_queue(tnew)
