@@ -146,7 +146,7 @@ end
 
 Draws a grid as png. 
 """
-function toPic(g :: Grid, cell_size = 50, show = true)
+function toPic(g :: Grid, pth = [], cell_size = 50, show = true)
     img_w = g.cols * cell_size
     img_h = g.rows * cell_size
     Drawing(img_w+5, img_h+5, "maze.png")
@@ -190,6 +190,22 @@ function toPic(g :: Grid, cell_size = 50, show = true)
     # draw lines in the north & on the right 
     line(Point(img_w,0), Point(img_w,img_h), :stroke)
     line(Point(0,img_h), Point(img_w,img_h), :stroke)
+
+    if(!isempty(pth))
+        sethue("red")
+        for ind = 1:length(pth)-1
+            strt = pth[ind]
+            stp = pth[ind+1]
+            # @show strt, stp
+            p1 = Point(cell_size/2 + (strt[2]-1)*cell_size, cell_size/2 + (strt[1]-1)*cell_size)
+            p2 = Point(cell_size/2 + (stp[2]-1)*cell_size, cell_size/2 + (stp[1]-1)*cell_size)
+            line(p1, p2, :stroke)
+        end
+    end
+
+
+
+
     finish()
     if(show)
         preview()
