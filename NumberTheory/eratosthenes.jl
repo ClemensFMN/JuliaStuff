@@ -18,5 +18,5 @@ end
 
 
 # res = sieve(100)
-res = sieve(1_000_000)
-println(res)
+# res = sieve(100_000)
+#println(res)
