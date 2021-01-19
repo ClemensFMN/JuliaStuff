@@ -66,11 +66,11 @@ function bfs_struct(G, s)
     enqueue!(Q, s)
 
     while(!isempty(Q)) # do while queue is not empty
+        println("Q at beginning:", Q)
         u = dequeue!(Q)
-        # @show u
+        println("visited vertex:", u, " with attributes ", vertices[u])
         for adj in G[u]
             if(vertices[adj].color == White) # not visited?
-                println(adj)
                 vertices[adj].color = Grey
                 vertices[adj].d = vertices[u].d + 1
                 vertices[adj].parent = u
