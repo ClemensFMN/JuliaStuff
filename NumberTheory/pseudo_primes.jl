@@ -1,3 +1,7 @@
+using Plots
+plotly()
+using Primes
+
 # calculate the pseudoprimes of a given composite number n
 function getPseudoPrimes(n)
     n = BigInt(n)
@@ -19,7 +23,10 @@ function getPseudoPrimes(n)
 end
 
 # pp, cnt = getPseudoPrimes(341)
+strt = 101
+stp = 1001
 
-nvec = 101:2:201
+nvec = setdiff(strt:2:stp, primes(strt, stp))
 
 res = getPseudoPrimes.(nvec)
+plot(nvec, res)
