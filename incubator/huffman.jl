@@ -3,18 +3,18 @@
 abstract type HuffmanTree end
  
 struct HuffmanLeaf <: HuffmanTree
-    ch::Char
-    freq::Int
+    ch::Int
+    freq::Real
 end
  
 struct HuffmanNode <: HuffmanTree
-    freq::Int
+    freq::Real
     left::HuffmanTree
     right::HuffmanTree
 end
 
 function makefreqdict(s::String)
-    d = Dict{Char, Int}()
+    d = Dict{Char, Real}()
     for c in s
         if !haskey(d, c)
             d[c] = 1
@@ -48,15 +48,54 @@ function printencoding(nd::HuffmanNode, code)
     code = code[1:end-1]
 end
 
-const msg = "this is an example for huffman encoding"
+function getencoding(lf::HuffmanLeaf, code, dct)
+    dct[lf.ch] = code
+    dct
+end
 
-frq = makefreqdict(msg)
-tree = huffmantree(frq)
+function getencoding(nd::HuffmanNode, code, dct)
+    code *= '0'
+    dct = getencoding(nd.left, code, dct)
+    code = code[1:end-1]
+ 
+    code *= '1'
+    dct = getencoding(nd.right, code, dct)
+    code = code[1:end-1]
+    dct
+end
 
-txt = printencoding(tree, "")
+# get average code length
+function avgcl(frq, dct)
+    syms = keys(frq)
+    avg  = 0
+    for sym in syms
+        p = frq[sym]
+        cd = dct[sym]
+        avg += p * length(cd)
+    end
+    avg
+end
 
+entropy(probs) = -sum(probs .* log.(2,probs))
 
+function demo()
 
-println("Char\tFreq\tHuffman code")
+    # example 1
+    # frq = Dict(1 => 0.08, 2 => 0.1, 3 => 0.12, 4 => 0.25, 5 => 0.45)
 
-printencoding(huffmantree(makefreqdict(msg)), "")
+    # example 2
+    frq = Dict(1 => 0.01, 2 => 0.02, 3 => 0.05, 4 => 0.05, 5 => 0.1, 6 => 0.1, 7 => 0.17, 8 => 0.5)
+
+    tree = huffmantree(frq)
+
+    # txt = printencoding(tree, "")
+
+    dct = getencoding(tree, "", Dict{Int, String}())
+
+    @show dct
+
+    avl = avgcl(frq, dct)
+    @show avl
+    @show entropy(values(frq))
+end
+
