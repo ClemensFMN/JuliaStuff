@@ -7,6 +7,7 @@ function oneRun(N)
 
     ps = rand(p, N)
     ps = ps ./ sum(ps)
+    # @show ps
 
     frq = Dict(zip(1:N, ps))
     tree = huffmantree(frq)
@@ -14,26 +15,30 @@ function oneRun(N)
     dct = getencoding(tree, "", Dict{Int, String}())
     # @show dct
 
-    avl = avgcl(frq, dct)
+    # avl = avgcl(frq, dct)
+    stat = cw_stats(frq, dct)
     # @show avl
     # @show entropy(values(frq))
-    (avl, entropy(values(frq)))
+    # (avl, entropy(values(frq)))
+    (stat, entropy(values(frq)))
 end
 
-RUNS = 100
+RUNS = 10000
 N = 32
 
-avl = zeros(RUNS)
+stat = zeros(3, RUNS)
 H = zeros(RUNS)
 
 for iter = 1:RUNS
-    (avl[iter], H[iter]) = oneRun(N)
+    (stat[:,iter], H[iter]) = oneRun(N)
 end
 
 @show log(2, N)
-@show mean(avl)
+@show mean(stat[1,:])
 @show mean(H)
-@show mean((avl .- H) ./ H)
+@show mean((stat[1,:] .- H) ./ H)
+@show maximum(stat[2,:])
+@show minimum(stat[3,:])
 
 
 

@@ -76,6 +76,21 @@ function avgcl(frq, dct)
     avg
 end
 
+# get statistics from code: mean code length, max & min codeword length
+function cw_stats(frq, dct)
+    syms = keys(frq)
+    avg  = 0
+    for sym in syms
+        p = frq[sym]
+        cd = dct[sym]
+        avg += p * length(cd)
+    end
+    cws = values(dct) # get codewords
+    ls = length.(cws) # get their length
+    [avg maximum(ls) minimum(ls)]
+end 
+
+
 entropy(probs) = -sum(probs .* log.(2,probs))
 
 function demo()
@@ -94,8 +109,8 @@ function demo()
 
     @show dct
 
-    avl = avgcl(frq, dct)
-    @show avl
+    stat = cw_stats(frq, dct)
+    @show stat
     @show entropy(values(frq))
 end
 
