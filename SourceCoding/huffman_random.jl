@@ -7,7 +7,10 @@ function oneRun(N)
 
     ps = rand(p, N)
     ps = ps ./ sum(ps)
-    # @show ps
+    # tilt the first symbol probability
+    #ps[1] = 0.7
+    #ps = ps ./ sum(ps)
+    #@show ps
 
     frq = Dict(zip(1:N, ps))
     tree = huffmantree(frq)
@@ -23,7 +26,7 @@ function oneRun(N)
     (stat, entropy(values(frq)))
 end
 
-RUNS = 10000
+RUNS = 1 #0000
 N = 32
 
 stat = zeros(3, RUNS)
