@@ -10,7 +10,7 @@ using StatsPlots
 end
 
 
-c = sample(normal_demo(0.5), HMC(10000, 0.1, 5))
+c = sample(normal_demo(0.5), HMC(0.1, 5), 1000)
 # c = sample(normal_demo(0.5), SMC(1000))
 
 print(c)
