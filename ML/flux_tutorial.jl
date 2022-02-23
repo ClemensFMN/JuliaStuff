@@ -11,7 +11,7 @@ ground_truth(x) = ktrue * x .+ dtrue
 N = 1_000
 
 x_train = 5 .* rand(N)
-y_train = ground_truth(x_train) .+ 0.05 .* randn(1)
+y_train = ground_truth(x_train) .+ 0.05 .* randn(N)
 
 
 model(x) = k*x .+ d
