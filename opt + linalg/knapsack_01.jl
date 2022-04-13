@@ -52,6 +52,7 @@ end
 # now we calc m[i,w]
 for i in 1:n
     for j in 1:W
+
         if j >= wvec[i]
             #@show i,j
             # the i-th element would fit in -> there are two options
@@ -60,10 +61,9 @@ for i in 1:n
             # option #2: add this new item
             cand2 = m[(i-1, j-wvec[i])] + vvec[i]
 
-
             # do what yields a higher total value
             m[(i, j)] = max(cand1, cand2)
-            
+
             # and update the bag content accordingly
             if(cand1 > cand2)
                 # option 1: keep previous content
@@ -71,7 +71,7 @@ for i in 1:n
                 content[(i, j)] = copy(temp)
             else
                 # option 2: add new item
-                temp = content[(i-1, j-wvec[i]+1)]
+                temp = content[(i-1, j-wvec[i])]
                 content[(i, j)] = copy(temp)
                 append!(content[(i, j)], i)
             end
