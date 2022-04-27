@@ -4,7 +4,7 @@ using LightGraphs
 # we want to solve a maze using Dijkstra's algorithm
 
 # let's create a maze first
-g = Grid(10,10)
+g = Grid(50,50)
 setupGrid(g)
 AldousBroder(g)
 
@@ -47,7 +47,7 @@ lg, weight_mtx = createGraph(g)
 collect(edges(lg))
 
 res = dijkstra_shortest_paths(lg, 1, weight_mtx)
-pth = enumerate_paths(res, 100)
+pth = enumerate_paths(res, 2500)
 
 pth = map(x->toCell(x,g), pth)
 
