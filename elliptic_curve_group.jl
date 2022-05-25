@@ -12,7 +12,7 @@ mutable struct ECPoint
     y :: Integer
 end
 
-immutable ECId
+struct ECId
 end
 
 # a group element on an elliptic curve can be either a point or the identity element

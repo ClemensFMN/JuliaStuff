@@ -18,8 +18,8 @@ function getPseudoPrimes(n)
             cnt += 1
         end
     end
-    # return(cnt, pp)
-    return(cnt)
+    return(cnt, pp)
+    # return(cnt)
 end
 
 # pp, cnt = getPseudoPrimes(341)
@@ -28,5 +28,5 @@ stp = 1001
 
 nvec = setdiff(strt:2:stp, primes(strt, stp))
 
-res = getPseudoPrimes.(nvec)
-plot(nvec, res)
+#res = getPseudoPrimes.(nvec)
+#plot(nvec, res)

@@ -1,7 +1,7 @@
 using JuMP
 import GLPK
 
-profit = [3,5,1]
+profit = [3,5,7]
 weight = [2,3,5]
 capacity = 6
 
@@ -15,6 +15,7 @@ model = Model(GLPK.Optimizer)
 # Constraint: can carry all
 @constraint(model, weight' * x <= capacity)
 @constraint(model, 0 .<= x .<= 1)
+# @constraint(model, 0 .<= x)
 
 # Solve problem using MIP solver
 optimize!(model)

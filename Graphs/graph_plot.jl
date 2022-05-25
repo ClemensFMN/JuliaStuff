@@ -49,7 +49,8 @@ function convert_uwmtx2vec(m)
 end
 
 function plotUndirectedGraph(g, weight_mtx)
-    gplothtml(g, nodelabel=1:6, edgelabel=convert_uwmtx2vec(weight_mtx))
+    nv, ne = size(g)
+    gplothtml(g, nodelabel=1:nv, edgelabel=convert_uwmtx2vec(weight_mtx))
 end
 
 function convert_dwmtx2vec(m)
@@ -67,5 +68,6 @@ function convert_dwmtx2vec(m)
 end
 
 function plotDirectedGraph(g, weight_mtx)
-    gplothtml(g, nodelabel=1:6, edgelabel=convert_dwmtx2vec(weight_mtx))
+    nv, ne = size(g)
+    gplothtml(g, nodelabel=1:nv, edgelabel=convert_dwmtx2vec(weight_mtx))
 end

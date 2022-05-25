@@ -1,10 +1,12 @@
 using LightGraphs, LightGraphsFlows
 using Distributions
 
+# test performance of random graph creation and max-flow detemrination.
+
 
 function runMe(RUNS, p)
 
-    nv = 100
+    nv = 500
     flow = zeros(RUNS)
     pdist = Uniform(0,1)
 
@@ -28,11 +30,11 @@ function runMe(RUNS, p)
         flow[run] = f
 
     end
-    flow
+    #flow
 end
 
 
-RUNS = 10000
+RUNS = 100
 
 
-@time res=runMe(RUNS, 0.1)
+@time res=runMe(RUNS, 0.5)

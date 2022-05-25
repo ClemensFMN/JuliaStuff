@@ -4,7 +4,7 @@
 
 wvec = [2, 3, 5]
 vvec = [3, 5, 7]
-W = 5
+W = 6
 
 # taken from Kellerer et al, Knapsack Problems (p. 16)
 #wvec = [2, 3, 6, 7, 5, 9, 4]
