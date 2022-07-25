@@ -1,8 +1,7 @@
 using JuMP
-using GLPK
+using HiGHS
 
-model = Model(with_optimizer(GLPK.Optimizer))
-
+model = Model(HiGHS.Optimizer)
 @variable(model, 0 <= x <= 5, Int)
 @variable(model, 0 <= y <= 5, Int)
 
